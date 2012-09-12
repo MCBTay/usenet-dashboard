@@ -4,6 +4,8 @@ import gtk
 import webkit
 
 def CloseWindow(caller_widget):
+    #future settings here to either just close the GUI
+    #or kill the app entirely
     gtk.main_quit() 
 
 def CreateMenuBar(agr):
@@ -59,11 +61,11 @@ def CreateButtonBar(win):
     dognzb = CreateButton(hbox, "DogNZB", "img/sabnzbd.png")
 
     hbox.pack_start(sabnzbd)
-    hbox.pack_start(sickbeard);
-    hbox.pack_start(couchpotato);
-    hbox.pack_start(headphones);
-    hbox.pack_start(nzbmatrix);
-    hbox.pack_start(dognzb);                
+    hbox.pack_start(sickbeard)
+    hbox.pack_start(couchpotato)
+    hbox.pack_start(headphones)
+    hbox.pack_start(nzbmatrix)
+    hbox.pack_start(dognzb)             
     
     return hbox
     
