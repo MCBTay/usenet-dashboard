@@ -6,11 +6,16 @@ import string
 
 pages = dict()
 global browser
+global window
 
 def CloseWindow(caller_widget):
     #future settings here to either just close the GUI
     #or kill the app entirely
     gtk.main_quit() 
+    
+def title_changed(webview, frame, title):
+    global window
+    window.set_title(title)
 
 def CreateMenuBar(agr):
     menuBar = gtk.MenuBar()
@@ -31,7 +36,7 @@ def CreateMenuBar(agr):
     fileMenu.append(exit)
     
     menuBar.append(itemFile)
-    menuBar.show()
+    #menuBar.show()
     return menuBar
     
 def CreateButton(hbox, labeltext, imagepath):
@@ -39,9 +44,9 @@ def CreateButton(hbox, labeltext, imagepath):
     
     image = gtk.Image()
     image.set_from_file(imagepath)
-    image.show()
+    #image.show()
     label = gtk.Label(labeltext)
-    label.show()    
+    #label.show()    
 
     box.pack_start(image, False, False, 3)
     box.pack_start(label, False, False, 3)
@@ -53,7 +58,7 @@ def CreateButton(hbox, labeltext, imagepath):
      
 def CreateButtonBar(win):
     hbox = gtk.HBox(False, 5)
-    hbox.show()
+    #hbox.show()
     
     sabnzbd = CreateButton(hbox, "SABnzbd+", "img/sabnzbd.png")
     sickbeard = CreateButton(hbox, "Sick Beard", "img/sickbeard.png")
@@ -85,19 +90,19 @@ def CreateWebBox():
     settings.set_property("enable-universal-access-from-file-uris", True)
     return web
     
-    
-win = gtk.Window()
+      
+window = gtk.Window()
 
-win.set_title("Usenet Dashboard")
-win.set_position(gtk.WIN_POS_CENTER)
-win.resize(500, 500)
+window.set_position(gtk.WIN_POS_CENTER)
+window.resize(500, 500)
 
-win.connect("destroy", CloseWindow)
+window.connect("destroy", CloseWindow)
+
 
 agr = gtk.AccelGroup()
-win.add_accel_group(agr)
+window.add_accel_group(agr)
 menuBar = CreateMenuBar(agr)
-hbox = CreateButtonBar(win)
+hbox = CreateButtonBar(window)
 
 pages['sabnzbd+'] = 'http://localhost:8080/sabnzbd'
 pages['sick beard'] = 'http://localhost:8081/home/'
@@ -107,7 +112,8 @@ pages['dognzb'] = 'https://dognzb.cr/browse';
 
 browser = CreateWebBox()
 browser.open(pages['sabnzbd+'])
-browser.show()
+browser.connect("title-changed", title_changed)
+#browser.show()
 
 scroller = gtk.ScrolledWindow()
 scroller.add(browser)
@@ -116,6 +122,6 @@ vbox = gtk.VBox(False, 2)
 vbox.pack_start(menuBar, False, False, 0)
 vbox.pack_start(hbox, False, False, 0)
 vbox.pack_start(scroller)
-win.add(vbox)
-win.show_all()
+window.add(vbox)
+window.show_all()
 gtk.main()
