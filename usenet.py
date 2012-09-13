@@ -36,7 +36,6 @@ def CreateMenuBar(agr):
     fileMenu.append(exit)
     
     menuBar.append(itemFile)
-    #menuBar.show()
     return menuBar
     
 def CreateButton(hbox, labeltext, imagepath):
@@ -44,9 +43,7 @@ def CreateButton(hbox, labeltext, imagepath):
     
     image = gtk.Image()
     image.set_from_file(imagepath)
-    #image.show()
-    label = gtk.Label(labeltext)
-    #label.show()    
+    label = gtk.Label(labeltext)  
 
     box.pack_start(image, False, False, 3)
     box.pack_start(label, False, False, 3)
@@ -58,7 +55,6 @@ def CreateButton(hbox, labeltext, imagepath):
      
 def CreateButtonBar(win):
     hbox = gtk.HBox(False, 5)
-    #hbox.show()
     
     sabnzbd = CreateButton(hbox, "SABnzbd+", "img/sabnzbd.png")
     sickbeard = CreateButton(hbox, "Sick Beard", "img/sickbeard.png")
@@ -113,7 +109,6 @@ pages['dognzb'] = 'https://dognzb.cr/browse';
 browser = CreateWebBox()
 browser.open(pages['sabnzbd+'])
 browser.connect("title-changed", title_changed)
-#browser.show()
 
 scroller = gtk.ScrolledWindow()
 scroller.add(browser)
