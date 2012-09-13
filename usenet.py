@@ -54,6 +54,13 @@ def CreateButton(hbox, labeltext, imagepath):
     button.connect("clicked", button_clicked)
     
     hbox.pack_start(button)
+    
+def CreateNavButton(hbox, icon):
+    image = gtk.Image()
+    image.set_from_stock(icon, 32)
+    button = gtk.Button()
+    button.add(image)
+    hbox.pack_start(button)
      
 def CreateButtonBar(win):
     hbox = gtk.HBox(False, 5)
@@ -64,6 +71,10 @@ def CreateButtonBar(win):
     CreateButton(hbox, "Headphones", "img/headphones.png")
     CreateButton(hbox, "NZBMatrix", "img/nzbmatrix.png")
     CreateButton(hbox, "DogNZB", "img/sabnzbd.png")
+    
+    CreateNavButton(hbox, gtk.STOCK_GO_BACK)
+    CreateNavButton(hbox, gtk.STOCK_GO_FORWARD)
+    CreateNavButton(hbox, gtk.STOCK_REFRESH)
     
     return hbox
     
@@ -85,7 +96,7 @@ def CreateWebBox():
 window = gtk.Window()
 
 window.set_position(gtk.WIN_POS_CENTER)
-window.resize(500, 500)
+window.resize(600, 600)
 
 window.connect("destroy", CloseWindow)
 
