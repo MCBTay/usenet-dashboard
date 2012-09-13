@@ -48,6 +48,7 @@ def CreateButton(hbox, labeltext, imagepath):
     
     button = gtk.Button()
     button.add(box)
+    button.connect("clicked", button_clicked)
     return button
      
 def CreateButtonBar(win):
@@ -55,9 +56,7 @@ def CreateButtonBar(win):
     hbox.show()
     
     sabnzbd = CreateButton(hbox, "SABnzbd+", "img/sabnzbd.png")
-    sabnzbd.connect("clicked", button_clicked)
     sickbeard = CreateButton(hbox, "Sick Beard", "img/sickbeard.png")
-    sickbeard.connect("clicked", button_clicked)
     couchpotato = CreateButton(hbox, "Couch Potato", "img/couchpotato.png")
     headphones = CreateButton(hbox, "Headphones", "img/headphones.png")
     nzbmatrix = CreateButton(hbox, "NZBMatrix", "img/nzbmatrix.png")
@@ -101,6 +100,9 @@ hbox = CreateButtonBar(win)
 
 pages['sabnzbd+'] = 'http://localhost:8080/sabnzbd'
 pages['sick beard'] = 'http://localhost:8081/home/'
+pages['couch potato'] = 'http://localhost:5000/movie/'
+pages['nzbmatrix'] = 'http://nzbmatrix.com/index.php'
+pages['dognzb'] = 'https://dognzb.cr/browse';
 
 browser = CreateWebBox()
 browser.open(pages['sabnzbd+'])
