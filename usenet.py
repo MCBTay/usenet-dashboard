@@ -43,6 +43,7 @@ def CreateButton(hbox, labeltext, imagepath):
     
     image = gtk.Image()
     image.set_from_file(imagepath)
+    
     label = gtk.Label(labeltext)  
 
     box.pack_start(image, False, False, 3)
@@ -51,24 +52,18 @@ def CreateButton(hbox, labeltext, imagepath):
     button = gtk.Button()
     button.add(box)
     button.connect("clicked", button_clicked)
-    return button
+    
+    hbox.pack_start(button)
      
 def CreateButtonBar(win):
     hbox = gtk.HBox(False, 5)
     
-    sabnzbd = CreateButton(hbox, "SABnzbd+", "img/sabnzbd.png")
-    sickbeard = CreateButton(hbox, "Sick Beard", "img/sickbeard.png")
-    couchpotato = CreateButton(hbox, "Couch Potato", "img/couchpotato.png")
-    headphones = CreateButton(hbox, "Headphones", "img/headphones.png")
-    nzbmatrix = CreateButton(hbox, "NZBMatrix", "img/nzbmatrix.png")
-    dognzb = CreateButton(hbox, "DogNZB", "img/sabnzbd.png")
-
-    hbox.pack_start(sabnzbd)
-    hbox.pack_start(sickbeard)
-    hbox.pack_start(couchpotato)
-    hbox.pack_start(headphones)
-    hbox.pack_start(nzbmatrix)
-    hbox.pack_start(dognzb)             
+    CreateButton(hbox, "SABnzbd+", "img/sabnzbd.png")
+    CreateButton(hbox, "Sick Beard", "img/sickbeard.png")
+    CreateButton(hbox, "Couch Potato", "img/couchpotato.png")
+    CreateButton(hbox, "Headphones", "img/headphones.png")
+    CreateButton(hbox, "NZBMatrix", "img/nzbmatrix.png")
+    CreateButton(hbox, "DogNZB", "img/sabnzbd.png")
     
     return hbox
     
