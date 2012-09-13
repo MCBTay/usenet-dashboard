@@ -90,6 +90,7 @@ win = gtk.Window()
 
 win.set_title("Usenet Dashboard")
 win.set_position(gtk.WIN_POS_CENTER)
+win.resize(500, 500)
 
 win.connect("destroy", CloseWindow)
 
@@ -108,10 +109,13 @@ browser = CreateWebBox()
 browser.open(pages['sabnzbd+'])
 browser.show()
 
+scroller = gtk.ScrolledWindow()
+scroller.add(browser)
+
 vbox = gtk.VBox(False, 2)
 vbox.pack_start(menuBar, False, False, 0)
 vbox.pack_start(hbox, False, False, 0)
-vbox.pack_start(browser, False, False, 0)
+vbox.pack_start(scroller)
 win.add(vbox)
 win.show_all()
 gtk.main()
