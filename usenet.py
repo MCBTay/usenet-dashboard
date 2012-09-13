@@ -2,6 +2,10 @@
 
 import gtk
 import webkit
+import string
+
+pages = dict()
+global browser
 
 def CloseWindow(caller_widget):
     #future settings here to either just close the GUI
@@ -16,11 +20,11 @@ def CreateMenuBar(agr):
     itemFile.set_submenu(fileMenu)    
 
     options = gtk.MenuItem("Options")
-    #options.connect("activate", gtk.main_quit)
     #somehow create an options panel here for some simple settings and adding
     #which sites you want to monitor
     fileMenu.append(options)
 
+    #why no icon show up
     exit = gtk.ImageMenuItem(gtk.STOCK_QUIT, agr)
     #exit = gtk.MenuItem("Exit")
     exit.connect("activate", gtk.main_quit)
@@ -37,8 +41,7 @@ def CreateButton(hbox, labeltext, imagepath):
     image.set_from_file(imagepath)
     image.show()
     label = gtk.Label(labeltext)
-    label.show()
-    
+    label.show()    
 
     box.pack_start(image, False, False, 3)
     box.pack_start(label, False, False, 3)
@@ -46,15 +49,15 @@ def CreateButton(hbox, labeltext, imagepath):
     button = gtk.Button()
     button.add(box)
     return button
-    
-    
+     
 def CreateButtonBar(win):
     hbox = gtk.HBox(False, 5)
     hbox.show()
-    #win.add(hbox)
     
     sabnzbd = CreateButton(hbox, "SABnzbd+", "img/sabnzbd.png")
+    sabnzbd.connect("clicked", button_clicked)
     sickbeard = CreateButton(hbox, "Sick Beard", "img/sickbeard.png")
+    sickbeard.connect("clicked", button_clicked)
     couchpotato = CreateButton(hbox, "Couch Potato", "img/couchpotato.png")
     headphones = CreateButton(hbox, "Headphones", "img/headphones.png")
     nzbmatrix = CreateButton(hbox, "NZBMatrix", "img/nzbmatrix.png")
@@ -69,6 +72,19 @@ def CreateButtonBar(win):
     
     return hbox
     
+def button_clicked(button):
+    #ugly but works
+    buttonName = button.get_child().get_children()[1].get_label()
+    url = pages[string.lower(buttonName)]
+    global browser
+    browser.open(url)
+    
+def CreateWebBox():
+    web = webkit.WebView()
+    settings = web.get_settings()
+    #what does this do?
+    settings.set_property("enable-universal-access-from-file-uris", True)
+    return web
     
     
 win = gtk.Window()
@@ -83,16 +99,17 @@ win.add_accel_group(agr)
 menuBar = CreateMenuBar(agr)
 hbox = CreateButtonBar(win)
 
-web = webkit.WebView()       
-settings = web.get_settings()
-settings.set_property("enable-universal-access-from-file-uris", True)
-web.open("http://localhost:8080/sabnzbd/")
-web.show()
-#win.add(web)
+pages['sabnzbd+'] = 'http://localhost:8080/sabnzbd'
+pages['sick beard'] = 'http://localhost:8081/home/'
+
+browser = CreateWebBox()
+browser.open(pages['sabnzbd+'])
+browser.show()
+
 vbox = gtk.VBox(False, 2)
 vbox.pack_start(menuBar, False, False, 0)
 vbox.pack_start(hbox, False, False, 0)
-vbox.pack_start(web, False, False, 0)
+vbox.pack_start(browser, False, False, 0)
 win.add(vbox)
 win.show_all()
-gtk.main() # Enter the 'GTK mainloop', so that the GTK app starts to run
+gtk.main()
