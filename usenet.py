@@ -89,7 +89,7 @@ def CreateWebBox():
     
 win = gtk.Window()
 
-win.set_title("Simple Web Browser")
+win.set_title("Usenet Dashboard")
 win.set_position(gtk.WIN_POS_CENTER)
 
 win.connect("destroy", CloseWindow)
