@@ -4,6 +4,7 @@ import gtk
 import webkit
 import string
 import xml.etree.ElementTree as ET
+from preferences_window import PreferencesWindow
 
 global browser
 global window
@@ -14,6 +15,10 @@ def CloseWindow(caller_widget):
     #future settings here to either just close the GUI
     #or kill the app entirely
     gtk.main_quit() 
+    
+def CreatePreferencesWindow(caller_widget):
+    win = PreferencesWindow()
+    
     
 def title_changed(webview, frame, title):
     global window
@@ -26,14 +31,11 @@ def CreateMenuBar(agr):
     itemFile = gtk.MenuItem("File")
     itemFile.set_submenu(fileMenu)    
 
-    options = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES, agr)
-    #somehow create an options panel here for some simple settings and adding
-    #which sites you want to monitor
-    fileMenu.append(options)
+    preferences = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES, agr)
+    preferences.connect("activate", CreatePreferencesWindow)
+    fileMenu.append(preferences)
 
-    #why no icon show up
     exit = gtk.ImageMenuItem(gtk.STOCK_CLOSE, agr)
-    #exit = gtk.MenuItem("Exit")
     exit.connect("activate", gtk.main_quit)
     fileMenu.append(exit)
     
