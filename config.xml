@@ -7,12 +7,12 @@
   <page>
     <name>sick beard</name>
     <url>http://localhost:8081/home/</url>
-    <enabled>1</enabled>
+    <enabled>0</enabled>
   </page>
   <page>
     <name>couch potato</name>
     <url>http://192.168.0.17:5000/movie/</url>
-    <enabled>1</enabled>
+    <enabled>0</enabled>
   </page>
   <page>
     <name>headphones</name>

@@ -67,13 +67,20 @@ def CreateNavButton(hbox, icon):
 def CreateButtonBar(win):
     hbox = gtk.HBox(False, 5)
     
-    CreateButton(hbox, "SABnzbd+", "img/sabnzbd.png")
-    CreateButton(hbox, "Sick Beard", "img/sickbeard.png")
-    CreateButton(hbox, "Couch Potato", "img/couchpotato.png")
-    CreateButton(hbox, "Headphones", "img/headphones.png")
-    CreateButton(hbox, "NZBMatrix", "img/nzbmatrix.png")
-    CreateButton(hbox, "DogNZB", "img/dognzb.png")
-    CreateButton(hbox, "NZBs.org","img/dognzb.png")
+    if pages.get('sabnzbd+'):
+      CreateButton(hbox, "SABnzbd+", "img/sabnzbd.png")
+    if pages.get('sick beard'):
+      CreateButton(hbox, "Sick Beard", "img/sickbeard.png")
+    if pages.get('couch potato'):
+      CreateButton(hbox, "Couch Potato", "img/couchpotato.png")
+    if pages.get('headphones'):
+      CreateButton(hbox, "Headphones", "img/headphones.png")
+    if pages.get('nzbmatrix'):
+      CreateButton(hbox, "NZBMatrix", "img/nzbmatrix.png")
+    if pages.get('dognzb'):
+      CreateButton(hbox, "DogNZB", "img/dognzb.png")
+    if pages.get('nzbs.org'):
+      CreateButton(hbox, "NZBs.org","img/dognzb.png")
     
     CreateNavButton(hbox, gtk.STOCK_GO_BACK)
     CreateNavButton(hbox, gtk.STOCK_GO_FORWARD)
@@ -103,12 +110,6 @@ window.resize(600, 600)
 
 window.connect("destroy", CloseWindow)
 
-
-agr = gtk.AccelGroup()
-window.add_accel_group(agr)
-menuBar = CreateMenuBar(agr)
-hbox = CreateButtonBar(window)
-
 #open the config file tabs:
 tree = ET.parse('config.xml')
 root=tree.getroot()
@@ -116,8 +117,16 @@ root=tree.getroot()
 for page in root.findall('page'):
   name = page.find('name').text
   url = page.find('url').text
-  enabled = page.find('enabled').text
-  pages[name] = [url,enabled]
+  enabled = int(page.find('enabled').text)
+  if enabled:
+    pages[name] = [url,enabled]
+
+agr = gtk.AccelGroup()
+window.add_accel_group(agr)
+menuBar = CreateMenuBar(agr)
+hbox = CreateButtonBar(window)
+
+
 
 browser = CreateWebBox()
 browser.open(pages['sabnzbd+'][0])
