@@ -3,10 +3,12 @@
 import gtk
 import webkit
 import string
-from pagesconfig import *
+import xml.etree.ElementTree as ET
 
 global browser
 global window
+
+pages = dict()
 
 def CloseWindow(caller_widget):
     #future settings here to either just close the GUI
@@ -24,13 +26,13 @@ def CreateMenuBar(agr):
     itemFile = gtk.MenuItem("File")
     itemFile.set_submenu(fileMenu)    
 
-    options = gtk.MenuItem("Options")
+    options = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES, agr)
     #somehow create an options panel here for some simple settings and adding
     #which sites you want to monitor
     fileMenu.append(options)
 
     #why no icon show up
-    exit = gtk.ImageMenuItem(gtk.STOCK_QUIT, agr)
+    exit = gtk.ImageMenuItem(gtk.STOCK_CLOSE, agr)
     #exit = gtk.MenuItem("Exit")
     exit.connect("activate", gtk.main_quit)
     fileMenu.append(exit)
@@ -82,7 +84,7 @@ def CreateButtonBar(win):
 def button_clicked(button):
     #ugly but works
     buttonName = button.get_child().get_children()[1].get_label()
-    url = pages[string.lower(buttonName)]
+    url = pages[string.lower(buttonName)][0]
     global browser
     browser.open(url)
     
@@ -107,9 +109,18 @@ window.add_accel_group(agr)
 menuBar = CreateMenuBar(agr)
 hbox = CreateButtonBar(window)
 
+#open the config file tabs:
+tree = ET.parse('config.xml')
+root=tree.getroot()
+
+for page in root.findall('page'):
+  name = page.find('name').text
+  url = page.find('url').text
+  enabled = page.find('enabled').text
+  pages[name] = [url,enabled]
 
 browser = CreateWebBox()
-browser.open(pages['sabnzbd+'])
+browser.open(pages['sabnzbd+'][0])
 browser.connect("title-changed", title_changed)
 
 scroller = gtk.ScrolledWindow()
