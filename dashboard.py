@@ -8,6 +8,7 @@ from preferences_window import PreferencesWindow
 
 global browser
 global window
+global configFile
 
 pages = dict()
 
@@ -17,7 +18,7 @@ def CloseWindow(caller_widget):
     gtk.main_quit() 
     
 def CreatePreferencesWindow(caller_widget):
-    win = PreferencesWindow()
+    PreferencesWindow()
     
     
 def title_changed(webview, frame, title):
@@ -43,6 +44,7 @@ def CreateMenuBar(agr):
     return menuBar
     
 def CreateButton(hbox, labeltext, imagepath):
+    vbox = gtk.VBox(False, 0)
     box = gtk.HBox(False, 0)
     
     image = gtk.Image()
@@ -54,7 +56,9 @@ def CreateButton(hbox, labeltext, imagepath):
     box.pack_start(label, False, False, 3)
     
     button = gtk.Button()
-    button.add(box)
+    vbox.pack_start(box)
+    vbox.pack_start(gtk.Label("Page title......."))
+    button.add(vbox)
     button.connect("clicked", button_clicked)
     
     hbox.pack_start(button)
@@ -67,26 +71,34 @@ def CreateNavButton(hbox, icon):
     hbox.pack_start(button)
      
 def CreateButtonBar(win):
+    global configFile    
+    
     hbox = gtk.HBox(False, 5)
     
-    if pages.get('sabnzbd+'):
-      CreateButton(hbox, "SABnzbd+", "img/sabnzbd.png")
-    if pages.get('sick beard'):
-      CreateButton(hbox, "Sick Beard", "img/sickbeard.png")
-    if pages.get('couch potato'):
-      CreateButton(hbox, "Couch Potato", "img/couchpotato.png")
-    if pages.get('headphones'):
-      CreateButton(hbox, "Headphones", "img/headphones.png")
-    if pages.get('nzbmatrix'):
-      CreateButton(hbox, "NZBMatrix", "img/nzbmatrix.png")
-    if pages.get('dognzb'):
-      CreateButton(hbox, "DogNZB", "img/dognzb.png")
-    if pages.get('nzbs.org'):
-      CreateButton(hbox, "NZBs.org","img/dognzb.png")
+    if configFile:
+        if pages.get('sabnzbd+'):
+          CreateButton(hbox, "SABnzbd+", "img/sabnzbd.png")
+        if pages.get('sick beard'):
+          CreateButton(hbox, "Sick Beard", "img/sickbeard.png")
+        if pages.get('couch potato'):
+          CreateButton(hbox, "Couch Potato", "img/couchpotato.png")
+        if pages.get('headphones'):
+          CreateButton(hbox, "Headphones", "img/headphones.png")
+        if pages.get('nzbmatrix'):
+          CreateButton(hbox, "NZBMatrix", "img/nzbmatrix.png")
+        if pages.get('dognzb'):
+          CreateButton(hbox, "DogNZB", "img/dognzb.png")
+        if pages.get('nzbs.org'):
+          CreateButton(hbox, "NZBs.org","img/dognzb.png")
     
+    
+    hbox.pack_start(gtk.Label(''), True, False)
+
     CreateNavButton(hbox, gtk.STOCK_GO_BACK)
     CreateNavButton(hbox, gtk.STOCK_GO_FORWARD)
     CreateNavButton(hbox, gtk.STOCK_REFRESH)
+
+    hbox.pack_start(gtk.Label(''), True, False)
     
     return hbox
     
@@ -105,14 +117,30 @@ def CreateWebBox():
     return web
 
 def parseConfig():
-    tree = ET.parse('config.xml')
-    root=tree.getroot()
-    for page in root.findall('page'):
-      name = page.find('name').text
-      url = page.find('url').text
-      enabled = int(page.find('enabled').text)
-      if enabled:
-        pages[name] = [url,enabled]
+    global configFile, window
+    try:
+        configFile = open("./config.xml")
+    except IOError:
+       configFile = None
+
+    if configFile:
+        tree = ET.parse('config.xml')
+        root=tree.getroot()
+        for page in root.findall('page'):
+          name = page.find('name').text
+          url = page.find('url').text
+          enabled = int(page.find('enabled').text)
+          if enabled:
+            pages[name] = [url,enabled]
+    else:
+        PreferencesWindow()
+        
+def get_first(iterable, default=None):
+    if iterable:
+        for item in iterable:
+            return item
+    return default
+        
 
       
 window = gtk.Window()
@@ -130,7 +158,8 @@ menuBar = CreateMenuBar(agr)
 hbox = CreateButtonBar(window)
 
 browser = CreateWebBox()
-browser.open(pages['sabnzbd+'][0])
+if configFile:
+    browser.open(get_first(pages)[0])
 browser.connect("title-changed", title_changed)
 
 scroller = gtk.ScrolledWindow()
