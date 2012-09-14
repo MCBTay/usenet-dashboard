@@ -3,8 +3,8 @@
 import gtk
 import webkit
 import string
+from pagesconfig import *
 
-pages = dict()
 global browser
 global window
 
@@ -70,7 +70,8 @@ def CreateButtonBar(win):
     CreateButton(hbox, "Couch Potato", "img/couchpotato.png")
     CreateButton(hbox, "Headphones", "img/headphones.png")
     CreateButton(hbox, "NZBMatrix", "img/nzbmatrix.png")
-    CreateButton(hbox, "DogNZB", "img/sabnzbd.png")
+    CreateButton(hbox, "DogNZB", "img/dognzb.png")
+    CreateButton(hbox, "NZBs.org","img/dognzb.png")
     
     CreateNavButton(hbox, gtk.STOCK_GO_BACK)
     CreateNavButton(hbox, gtk.STOCK_GO_FORWARD)
@@ -106,11 +107,6 @@ window.add_accel_group(agr)
 menuBar = CreateMenuBar(agr)
 hbox = CreateButtonBar(window)
 
-pages['sabnzbd+'] = 'http://localhost:8080/sabnzbd'
-pages['sick beard'] = 'http://localhost:8081/home/'
-pages['couch potato'] = 'http://localhost:5000/movie/'
-pages['nzbmatrix'] = 'http://nzbmatrix.com/index.php'
-pages['dognzb'] = 'https://dognzb.cr/browse';
 
 browser = CreateWebBox()
 browser.open(pages['sabnzbd+'])
