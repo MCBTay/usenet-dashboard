@@ -6,7 +6,7 @@ import string
 import xml.etree.ElementTree as ET
 from preferences_window import PreferencesWindow
 
-global browser
+global menuBar, buttonBar, browser
 global window
 global configFile
 
@@ -44,7 +44,7 @@ def CreateMenuBar(agr):
     return menuBar
     
 def CreateButton(hbox, labeltext, imagepath):
-    vbox = gtk.VBox(False, 0)
+    #vbox = gtk.VBox(False, 0)
     box = gtk.HBox(False, 0)
     
     image = gtk.Image()
@@ -56,9 +56,9 @@ def CreateButton(hbox, labeltext, imagepath):
     box.pack_start(label, False, False, 3)
     
     button = gtk.Button()
-    vbox.pack_start(box)
-    vbox.pack_start(gtk.Label("Page title......."))
-    button.add(vbox)
+    #vbox.pack_start(box)
+    #vbox.pack_start(gtk.Label("Page title......."))
+    button.add(box)
     button.connect("clicked", button_clicked)
     
     hbox.pack_start(button)
@@ -71,36 +71,37 @@ def CreateNavButton(hbox, icon):
     hbox.pack_start(button)
      
 def CreateButtonBar(win):
-    global configFile    
+    global configFile, buttonBar 
     
-    hbox = gtk.HBox(False, 5)
+    buttonBar = gtk.HBox(False, 5)
     
     if configFile:
+        #change this to a loop
         if pages.get('sabnzbd+'):
-          CreateButton(hbox, "SABnzbd+", "img/sabnzbd.png")
+          CreateButton(buttonBar, "SABnzbd+", "img/sabnzbd.png")
         if pages.get('sick beard'):
-          CreateButton(hbox, "Sick Beard", "img/sickbeard.png")
+          CreateButton(buttonBar, "Sick Beard", "img/sickbeard.png")
         if pages.get('couch potato'):
-          CreateButton(hbox, "Couch Potato", "img/couchpotato.png")
+          CreateButton(buttonBar, "Couch Potato", "img/couchpotato.png")
         if pages.get('headphones'):
-          CreateButton(hbox, "Headphones", "img/headphones.png")
+          CreateButton(buttonBar, "Headphones", "img/headphones.png")
         if pages.get('nzbmatrix'):
-          CreateButton(hbox, "NZBMatrix", "img/nzbmatrix.png")
+          CreateButton(buttonBar, "NZBMatrix", "img/nzbmatrix.png")
         if pages.get('dognzb'):
-          CreateButton(hbox, "DogNZB", "img/dognzb.png")
+          CreateButton(buttonBar, "DogNZB", "img/dognzb.png")
         if pages.get('nzbs.org'):
-          CreateButton(hbox, "NZBs.org","img/dognzb.png")
+          CreateButton(buttonBar, "NZBs.org","img/dognzb.png")
     
     
-    hbox.pack_start(gtk.Label(''), True, False)
+    buttonBar.pack_start(gtk.Label(''), True, False)
 
-    CreateNavButton(hbox, gtk.STOCK_GO_BACK)
-    CreateNavButton(hbox, gtk.STOCK_GO_FORWARD)
-    CreateNavButton(hbox, gtk.STOCK_REFRESH)
+    CreateNavButton(buttonBar, gtk.STOCK_GO_BACK)
+    CreateNavButton(buttonBar, gtk.STOCK_GO_FORWARD)
+    CreateNavButton(buttonBar, gtk.STOCK_REFRESH)
 
-    hbox.pack_start(gtk.Label(''), True, False)
+    buttonBar.pack_start(gtk.Label(''), True, False)
     
-    return hbox
+    return buttonBar
     
 def button_clicked(button):
     #ugly but works
@@ -112,20 +113,20 @@ def button_clicked(button):
 def CreateWebBox():
     web = webkit.WebView()
     settings = web.get_settings()
-    #what does this do?
-    settings.set_property("enable-universal-access-from-file-uris", True)
+    settings.set_property('enable-page-cache', True)
     return web
 
 def parseConfig():
     global configFile, window
     try:
-        configFile = open("./config.xml")
+        configFile = open('./config.xml')
     except IOError:
        configFile = None
 
     if configFile:
         tree = ET.parse('config.xml')
         root=tree.getroot()
+        print root.findall('page');
         for page in root.findall('page'):
           name = page.find('name').text
           url = page.find('url').text
@@ -137,6 +138,7 @@ def parseConfig():
         
 def get_first(iterable, default=None):
     if iterable:
+        print iterable
         for item in iterable:
             return item
     return default
@@ -148,7 +150,7 @@ window = gtk.Window()
 window.set_position(gtk.WIN_POS_CENTER)
 window.resize(600, 600)
 
-window.connect("destroy", CloseWindow)
+window.connect('destroy', CloseWindow)
 
 parseConfig()
 
@@ -158,9 +160,15 @@ menuBar = CreateMenuBar(agr)
 hbox = CreateButtonBar(window)
 
 browser = CreateWebBox()
+
 if configFile:
-    browser.open(get_first(pages)[0])
-browser.connect("title-changed", title_changed)
+    #even uglier, still works -- need to clean dear god
+    # had to do this to ensure 
+    buttonName = buttonBar.get_children()[0].get_children()[0].get_children()[1].get_label()
+    url = pages[string.lower(buttonName)][0]
+    browser.open(url)
+    
+browser.connect('title-changed', title_changed)
 
 scroller = gtk.ScrolledWindow()
 scroller.add(browser)
