@@ -101,7 +101,17 @@ def CreateWebBox():
     #what does this do?
     settings.set_property("enable-universal-access-from-file-uris", True)
     return web
-    
+
+def parseConfig():
+    tree = ET.parse('config.xml')
+    root=tree.getroot()
+    for page in root.findall('page'):
+      name = page.find('name').text
+      url = page.find('url').text
+      enabled = int(page.find('enabled').text)
+      if enabled:
+        pages[name] = [url,enabled]
+
       
 window = gtk.Window()
 
@@ -110,23 +120,12 @@ window.resize(600, 600)
 
 window.connect("destroy", CloseWindow)
 
-#open the config file tabs:
-tree = ET.parse('config.xml')
-root=tree.getroot()
-
-for page in root.findall('page'):
-  name = page.find('name').text
-  url = page.find('url').text
-  enabled = int(page.find('enabled').text)
-  if enabled:
-    pages[name] = [url,enabled]
+parseConfig()
 
 agr = gtk.AccelGroup()
 window.add_accel_group(agr)
 menuBar = CreateMenuBar(agr)
 hbox = CreateButtonBar(window)
-
-
 
 browser = CreateWebBox()
 browser.open(pages['sabnzbd+'][0])
