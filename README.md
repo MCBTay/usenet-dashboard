@@ -12,3 +12,10 @@ Usage:
 1. Set desired urls in pagesconfig.py
 2. 'sudo chmod +x usenet.py'
 3. './usenet.py'
+
+Troubleshooting:
+
+--If menu icons aren't present:
+   -Install dconf-tools
+   -Hit alt+f2, type 'dconf-editor'
+   -Change org>gnome>desktop>interface>menus-have-icons to true
