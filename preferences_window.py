@@ -44,7 +44,26 @@ class PreferencesWindow:
         self.vbox.pack_start(hbox, False)
         self.vbox.pack_start(gtk.Label(''), False)
         
-    def CreateNameField(self, vbox, nameText):
+    def CreateOrderSelector(self, box, order):
+        box.pack_start(gtk.Label('Order'), False)
+        
+        liststore = gtk.ListStore(str)
+        orderDropdown = gtk.ComboBox()
+        cell = gtk.CellRendererText()
+        orderDropdown.pack_start(cell, True)
+        orderDropdown.add_attribute(cell, 'text', 0)
+        
+        count = 1
+        while count <= len(self.pages):
+            liststore.append([str(count)])
+            count = count + 1
+         
+        orderDropdown.set_model(liststore)
+        orderDropdown.set_active(int(order)-1)
+        
+        box.pack_start(orderDropdown, True)
+        
+    def CreateNameField(self, vbox, nameText, order):
         name = gtk.HBox()
         name.set_spacing(10)
         name.pack_start(gtk.Label(''), False)
@@ -54,6 +73,9 @@ class PreferencesWindow:
         nameEntry.set_text(nameText)
         name.pack_start(nameLabel, False)
         name.pack_start(nameEntry)
+        
+        self.CreateOrderSelector(name, order)
+        
         name.pack_start(gtk.Label(''), False)
         vbox.pack_start(name, False)
         
@@ -86,12 +108,12 @@ class PreferencesWindow:
         img.pack_start(gtk.Label(''), False)
         vbox.pack_start(img, False)
            
-    def CreatePageEntry(self, name, url, img):
+    def CreatePageEntry(self, order, name, url, img):
         vbox = gtk.VBox()
         vbox.set_spacing(10)
         #vbox.pack_start(gtk.Label(''), False)
         
-        self.CreateNameField(vbox, name)
+        self.CreateNameField(vbox, name, order)
         self.CreateURLField(vbox, url)
         self.CreateImagePicker(vbox, img)        
 
@@ -106,9 +128,8 @@ class PreferencesWindow:
             count = 1
             while count <= len(self.pages):
                 for name in self.pages:
-                    print self.pages[name][0], ':::', count
                     if int(self.pages[name][0]) == count:
-                        self.CreatePageEntry(name, self.pages[name][1], self.pages[name][2])
+                        self.CreatePageEntry(self.pages[name][0], name, self.pages[name][1], self.pages[name][2])
                 count = count + 1
         else:
             self.CreatePageEntry('', '', '.')
