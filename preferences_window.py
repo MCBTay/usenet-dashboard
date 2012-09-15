@@ -35,11 +35,16 @@ class PreferencesWindow:
                     del(self.pages[tempField])
         else: 
             # so far URL is the only other case, so i'm handling it specifically
-            for tempField in self.pages.keys():
-                if tempField == name:
-                    self.pages[tempField][1] = newText 
+            self.pages[name][1] = newText
             
-            
+    def combobox_changed(self, caller_widget, name = None):
+        # offset by one because get_active() returns the index of the active, not data
+        newOrder = caller_widget.get_active() + 1 
+        self.pages[name][0] = str(newOrder)
+        
+    def filechooser_changed(self, caller_widget, name = None):
+        newImg = caller_widget.get_filename()
+        self.pages[name][2] = newImg
         
     # End Callbacks #
     
@@ -137,7 +142,7 @@ class PreferencesWindow:
         self.vbox.pack_start(hbox, False)
         self.vbox.pack_start(gtk.Label(''), False)
         
-    def CreateOrderSelector(self, box, order):
+    def CreateOrderSelector(self, box, order, name):
         box.pack_start(gtk.Label('Order'), False)
         
         liststore = gtk.ListStore(str)
@@ -145,6 +150,7 @@ class PreferencesWindow:
         cell = gtk.CellRendererText()
         orderDropdown.pack_start(cell, True)
         orderDropdown.add_attribute(cell, 'text', 0)
+        orderDropdown.connect('changed', self.combobox_changed, name)
         
         if len(self.pages) == 0:
             liststore.append([str(1)])
@@ -171,7 +177,7 @@ class PreferencesWindow:
         name.pack_start(nameLabel, False)
         name.pack_start(nameEntry)
         
-        self.CreateOrderSelector(name, order)
+        self.CreateOrderSelector(name, order, nameText)
         
         name.pack_start(gtk.Label(''), False)
         vbox.pack_start(name, False)
@@ -200,6 +206,7 @@ class PreferencesWindow:
         imgChooser.set_current_folder(".")
         imgChooser.connect('file-activated', self.file_selected, path)
         imgChooser.emit('file-activated')
+        imgChooser.connect('file-set', self.filechooser_changed, name)
         img.pack_start(imgLabel, False)
         img.pack_start(imgChooser)
         img.pack_start(gtk.Label(''), False)
