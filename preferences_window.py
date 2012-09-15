@@ -1,5 +1,6 @@
 import gtk
 import xml.etree.ElementTree as ET
+import xml.dom.minidom
 
 class PreferencesWindow:
     pages = dict()
@@ -11,7 +12,60 @@ class PreferencesWindow:
         
     def file_selected(self, caller_widget, data):
         caller_widget.set_filename(data)
+        
+    def save_preferences(self, caller_widget):
+        self.WriteConfig()
+        self.window.destroy()
     # End Callbacks #
+    
+    def PrettyPrint(self, elem, level=0):
+        i = "\n" + level*"  "
+        if len(elem):
+            if not elem.text or not elem.text.strip():
+                elem.text = i + "  "
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+            for elem in elem:
+                self.PrettyPrint(elem, level+1)
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+        else:
+            if level and (not elem.tail or not elem.tail.strip()):
+                elem.tail = i
+    
+    def WriteConfig(self):
+        try:
+            self.configFile = open('./config.xml', 'w+')
+        except IOError:
+            print "exception"
+            
+        root = ET.Element('pages')
+        for name in self.pages:
+            order = self.pages[name][0]
+            url   = self.pages[name][1]
+            img   = self.pages[name][2]
+ 
+            pageNode = ET.SubElement(root, 'page')
+            
+            orderNode = ET.SubElement(pageNode, 'order')
+            orderNode.text = order
+            
+            nameNode = ET.SubElement(pageNode, 'name')
+            nameNode.text = name
+            
+            urlNode = ET.SubElement(pageNode, 'url')
+            urlNode.text = url
+            
+            imgNode = ET.SubElement(pageNode, 'img')                        
+            imgNode.text = img
+        
+        tree = ET.ElementTree(root)
+        
+        self.PrettyPrint(root)
+        
+        tree.write('./config.xml')
+            
+    
     
     def ParseConfig(self):
         try:
@@ -33,6 +87,7 @@ class PreferencesWindow:
         hbox = gtk.HBox(False, 0)
         hbox.set_spacing(10)
         save = gtk.Button(stock = gtk.STOCK_SAVE)
+        save.connect('clicked', self.save_preferences)
         cancel = gtk.Button(stock = gtk.STOCK_CANCEL)
         cancel.connect('clicked', self.destroy_window)
         
@@ -53,10 +108,13 @@ class PreferencesWindow:
         orderDropdown.pack_start(cell, True)
         orderDropdown.add_attribute(cell, 'text', 0)
         
-        count = 1
-        while count <= len(self.pages):
-            liststore.append([str(count)])
-            count = count + 1
+        if len(self.pages) == 0:
+            liststore.append([str(1)])
+        else:
+            count = 1
+            while count <= len(self.pages):
+                liststore.append([str(count)])
+                count = count + 1
          
         orderDropdown.set_model(liststore)
         orderDropdown.set_active(int(order)-1)
@@ -100,7 +158,6 @@ class PreferencesWindow:
         imgLabel.set_width_chars(5)
         imgChooser = gtk.FileChooserButton('Image')
         imgChooser.set_current_folder(".")
-        #imgChooser.set_current_file(path)
         imgChooser.connect('file-activated', self.file_selected, path)
         imgChooser.emit('file-activated')
         img.pack_start(imgLabel, False)
@@ -111,7 +168,6 @@ class PreferencesWindow:
     def CreatePageEntry(self, order, name, url, img):
         vbox = gtk.VBox()
         vbox.set_spacing(10)
-        #vbox.pack_start(gtk.Label(''), False)
         
         self.CreateNameField(vbox, name, order)
         self.CreateURLField(vbox, url)
@@ -124,17 +180,20 @@ class PreferencesWindow:
     def CreatePreferences(self):   
         self.ParseConfig()
         self.vbox.pack_start(gtk.Label(''), False)
+        
         if self.configFile:
             count = 1
             while count <= len(self.pages):
                 for name in self.pages:
-                    if int(self.pages[name][0]) == count:
-                        self.CreatePageEntry(self.pages[name][0], name, self.pages[name][1], self.pages[name][2])
+                    order = self.pages[name][0]
+                    url   = self.pages[name][1]
+                    img   = self.pages[name][2]
+                    if int(order) == count:
+                        self.CreatePageEntry(order, name, url, img)
                 count = count + 1
         else:
-            self.CreatePageEntry('', '', '.')
-            # fill first page entry
-            # create others as needed
+            self.CreatePageEntry('1', '', '', '.')
+            
         self.CreateBottomButtons()
         
     def __init__(self):
