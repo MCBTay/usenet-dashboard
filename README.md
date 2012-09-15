@@ -19,6 +19,7 @@ Troubleshooting:
    -Install dconf-tools
    -Hit alt+f2, type 'dconf-editor'
    -Change org->gnome->desktop->interface->menus-have-icons to true
+   
 --Similarly, if button icons aren't present (save, close, etc)
    -open dconf-editor
    -Change org->gnome->desktop->interface->buttons-have-icons to true
