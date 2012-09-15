@@ -23,10 +23,11 @@ class PreferencesWindow:
             tree = ET.parse('config.xml')
             root = tree.getroot()
             for page in root.findall('page'):
-              name = page.find('name').text
-              url  = page.find('url').text
-              img  = page.find('img').text
-              self.pages[name] = [url, img]
+              name  = page.find('name').text
+              url   = page.find('url').text
+              img   = page.find('img').text
+              order = page.find('order').text
+              self.pages[name] = [order, url, img]
         
     def CreateBottomButtons(self):
         hbox = gtk.HBox(False, 0)
@@ -84,8 +85,7 @@ class PreferencesWindow:
         img.pack_start(imgChooser)
         img.pack_start(gtk.Label(''), False)
         vbox.pack_start(img, False)
-    
-        
+           
     def CreatePageEntry(self, name, url, img):
         vbox = gtk.VBox()
         vbox.set_spacing(10)
@@ -99,13 +99,17 @@ class PreferencesWindow:
         
         self.vbox.pack_start(vbox, False)
     
-
     def CreatePreferences(self):   
         self.ParseConfig()
         self.vbox.pack_start(gtk.Label(''), False)
         if self.configFile:
-            for name in self.pages:
-                self.CreatePageEntry(name, self.pages[name][0], self.pages[name][1])
+            count = 1
+            while count <= len(self.pages):
+                for name in self.pages:
+                    print self.pages[name][0], ':::', count
+                    if int(self.pages[name][0]) == count:
+                        self.CreatePageEntry(name, self.pages[name][1], self.pages[name][2])
+                count = count + 1
         else:
             self.CreatePageEntry('', '', '.')
             # fill first page entry
