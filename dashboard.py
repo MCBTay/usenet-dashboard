@@ -43,32 +43,32 @@ def CreateMenuBar(agr):
     menuBar.append(itemFile)
     return menuBar
     
-def CreateButton(hbox, labeltext, imagepath):
+def CreateButton(hbox, name):
     #vbox = gtk.VBox(False, 0)
     box = gtk.HBox(False, 0)
     
     image = gtk.Image()
-    image.set_from_file(imagepath)
+    image.set_from_file(pages[name][1])
     
-    label = gtk.Label(labeltext)  
+    label = gtk.Label(name)  
 
-    box.pack_start(image, False, False, 3)
-    box.pack_start(label, False, False, 3)
+    box.pack_start(image, False)
+    box.pack_start(label, False)
     
     button = gtk.Button()
     #vbox.pack_start(box)
-    #vbox.pack_start(gtk.Label("Page title......."))
+    #vbox.pack_start(gtk.Label("Page title.......?"))
     button.add(box)
     button.connect("clicked", button_clicked)
     
-    hbox.pack_start(button)
+    hbox.pack_start(button, False)
     
 def CreateNavButton(hbox, icon):
     image = gtk.Image()
     image.set_from_stock(icon, 32)
     button = gtk.Button()
     button.add(image)
-    hbox.pack_start(button)
+    hbox.pack_start(button, False)
      
 def CreateButtonBar(win):
     global configFile, buttonBar 
@@ -76,37 +76,21 @@ def CreateButtonBar(win):
     buttonBar = gtk.HBox(False, 5)
     
     if configFile:
-        #change this to a loop
-        if pages.get('sabnzbd+'):
-          CreateButton(buttonBar, "SABnzbd+", "img/sabnzbd.png")
-        if pages.get('sick beard'):
-          CreateButton(buttonBar, "Sick Beard", "img/sickbeard.png")
-        if pages.get('couch potato'):
-          CreateButton(buttonBar, "Couch Potato", "img/couchpotato.png")
-        if pages.get('headphones'):
-          CreateButton(buttonBar, "Headphones", "img/headphones.png")
-        if pages.get('nzbmatrix'):
-          CreateButton(buttonBar, "NZBMatrix", "img/nzbmatrix.png")
-        if pages.get('dognzb'):
-          CreateButton(buttonBar, "DogNZB", "img/dognzb.png")
-        if pages.get('nzbs.org'):
-          CreateButton(buttonBar, "NZBs.org","img/dognzb.png")
-    
+        for page in pages:
+            CreateButton(buttonBar, page)
     
     buttonBar.pack_start(gtk.Label(''), True, False)
 
     CreateNavButton(buttonBar, gtk.STOCK_GO_BACK)
     CreateNavButton(buttonBar, gtk.STOCK_GO_FORWARD)
     CreateNavButton(buttonBar, gtk.STOCK_REFRESH)
-
-    buttonBar.pack_start(gtk.Label(''), True, False)
     
     return buttonBar
     
 def button_clicked(button):
     #ugly but works
     buttonName = button.get_child().get_children()[1].get_label()
-    url = pages[string.lower(buttonName)][0]
+    url = pages[buttonName][0]
     global browser
     browser.open(url)
     
@@ -115,6 +99,11 @@ def CreateWebBox():
     settings = web.get_settings()
     settings.set_property('enable-page-cache', True)
     return web
+
+def writeConfig():
+    global configFile
+    
+    root = ET.Element("")
 
 def parseConfig():
     global configFile, window
@@ -130,15 +119,13 @@ def parseConfig():
         for page in root.findall('page'):
           name = page.find('name').text
           url = page.find('url').text
-          enabled = int(page.find('enabled').text)
-          if enabled:
-            pages[name] = [url,enabled]
+          img = page.find('img').text
+          pages[name] = [url, img]
     else:
         PreferencesWindow()
         
 def get_first(iterable, default=None):
     if iterable:
-        print iterable
         for item in iterable:
             return item
     return default
@@ -148,7 +135,7 @@ def get_first(iterable, default=None):
 window = gtk.Window()
 
 window.set_position(gtk.WIN_POS_CENTER)
-window.resize(600, 600)
+window.resize(1024, 768)
 
 window.connect('destroy', CloseWindow)
 
@@ -162,10 +149,10 @@ hbox = CreateButtonBar(window)
 browser = CreateWebBox()
 
 if configFile:
-    #even uglier, still works -- need to clean dear god
-    # had to do this to ensure 
+    # even uglier, still works -- need to clean dear god
+    # had to do this to ensure you get the first one, in order of insertion
     buttonName = buttonBar.get_children()[0].get_children()[0].get_children()[1].get_label()
-    url = pages[string.lower(buttonName)][0]
+    url = pages[buttonName][0]
     browser.open(url)
     
 browser.connect('title-changed', title_changed)
