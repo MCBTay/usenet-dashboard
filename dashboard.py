@@ -29,7 +29,7 @@ def title_changed(webview, frame, title):
 def button_clicked(button):
     #ugly but works
     buttonName = button.get_child().get_children()[1].get_label()
-    url = pages[buttonName][0]
+    url = pages[buttonName][1]
     global browser
     browser.open(url)
 # End Callbacks #
@@ -57,7 +57,7 @@ def CreateButton(hbox, name):
     box = gtk.HBox(False, 0)
     
     image = gtk.Image()
-    image.set_from_file(pages[name][1])
+    image.set_from_file(pages[name][2])
     
     label = gtk.Label(name)  
 
@@ -85,8 +85,12 @@ def CreateButtonBar(win):
     buttonBar = gtk.HBox(False, 5)
     
     if configFile:
-        for page in pages:
-            CreateButton(buttonBar, page)
+        count = 1
+        while count <= len(pages):
+            for page in pages:
+                if int(pages[page][0]) == count:
+                    CreateButton(buttonBar, page)
+            count = count + 1
     
     buttonBar.pack_start(gtk.Label(''), True, False)
 
@@ -117,13 +121,13 @@ def ParseConfig():
 
     if configFile:
         tree = ET.parse('config.xml')
-        root=tree.getroot()
-        print root.findall('page');
+        root = tree.getroot()
         for page in root.findall('page'):
           name = page.find('name').text
-          url = page.find('url').text
-          img = page.find('img').text
-          pages[name] = [url, img]
+          url  = page.find('url').text
+          img  = page.find('img').text
+          order= page.find('order').text
+          pages[name] = [order, url, img]
     else:
         PreferencesWindow()
         
@@ -154,8 +158,9 @@ browser = CreateWebBox()
 if configFile:
     # even uglier, still works -- need to clean dear god
     # had to do this to ensure you get the first one, in order of insertion
+    # !!! This already bit me in the ass haha
     buttonName = buttonBar.get_children()[0].get_children()[0].get_children()[1].get_label()
-    url = pages[buttonName][0]
+    url = pages[buttonName][1]
     browser.open(url)
     
 browser.connect('title-changed', title_changed)
