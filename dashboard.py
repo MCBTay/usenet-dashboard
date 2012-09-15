@@ -107,11 +107,6 @@ def CreateWebBox():
     settings.set_property('enable-page-cache', True)
     return web
 
-def WriteConfig():
-    global configFile
-    
-    root = ET.Element("")
-
 def ParseConfig():
     global configFile, window
     try:
