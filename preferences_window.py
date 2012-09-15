@@ -19,12 +19,51 @@ class PreferencesWindow:
 
         self.vbox.pack_start(hbox, False)
         
-    def CreatePreferences(self):
-        buttonText = gtk.CheckButton('Show text for buttons')        
-        buttonIcon = gtk.CheckButton('Show icons for buttons (if entered)')
+    def CreatePageEntry(self):
+        vbox = gtk.VBox()
+        vbox.set_spacing(10)
+        vbox.pack_start(gtk.Label(''), True)
         
-        self.vbox.pack_start(buttonText)
-        self.vbox.pack_start(buttonIcon)
+        name = gtk.HBox()
+        name.set_spacing(10)
+        name.pack_start(gtk.Label(''), False)
+        nameLabel = gtk.Label('Name')
+        nameLabel.set_width_chars(5)
+        nameEntry = gtk.Entry();
+        name.pack_start(nameLabel, False)
+        name.pack_start(nameEntry)
+        name.pack_start(gtk.Label(''), False)
+        vbox.pack_start(name, False)
+        
+        url = gtk.HBox()
+        url.set_spacing(10)
+        url.pack_start(gtk.Label(''), False)
+        urlLabel = gtk.Label('URL')
+        urlLabel.set_width_chars(5)
+        urlEntry = gtk.Entry();
+        url.pack_start(urlLabel, False)
+        url.pack_start(urlEntry, True)
+        url.pack_start(gtk.Label(''), False)
+        vbox.pack_start(url, False)
+        
+        img = gtk.HBox()
+        img.set_spacing(10)
+        img.pack_start(gtk.Label(''), False)
+        imgLabel = gtk.Label('Image');
+        imgLabel.set_width_chars(5)
+        imgChooser = gtk.FileChooserButton('Image')
+        img.pack_start(imgLabel, False)
+        img.pack_start(imgChooser)
+        img.pack_start(gtk.Label(''), False)
+        vbox.pack_start(img, False)
+        
+        vbox.pack_start(gtk.Label(''), True)
+        
+        self.vbox.pack_start(vbox)
+        
+    def CreatePreferences(self):        
+        self.CreatePageEntry()
+        
         
     def __init__(self):
         self.window = gtk.Window()
@@ -32,7 +71,7 @@ class PreferencesWindow:
         self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_MENU)
 
         self.window.set_position(gtk.WIN_POS_CENTER)
-        self.window.resize(150, 300)
+        self.window.resize(500, 500)
         
         self.window.connect('destroy', self.DestroyWindow)
         self.vbox = gtk.VBox(False, 0)
