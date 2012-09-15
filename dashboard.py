@@ -33,11 +33,14 @@ def button_clicked(button):
     browser.open(url)
     
 def back_button_clicked(button):
-    print 'back'
+    global browser
+    browser.go_back()
 def forward_button_clicked(button):
-    print 'forward'
+    global browser
+    browser.go_forward()
 def refresh_button_clicked(button):
-    print 'refresh'
+    global browser
+    browser.reload()
     
 def load_progress_changed(webview, amount):
     global progress
