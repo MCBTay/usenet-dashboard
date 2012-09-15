@@ -18,6 +18,7 @@ class PreferencesWindow:
         hbox.pack_start(gtk.Label(''), True, False)
 
         self.vbox.pack_start(hbox, False)
+        self.vbox.pack_start(gtk.Label(''), False)
         
     def CreateNameField(self, vbox):
         name = gtk.HBox()
@@ -59,19 +60,23 @@ class PreferencesWindow:
     def CreatePageEntry(self):
         vbox = gtk.VBox()
         vbox.set_spacing(10)
-        vbox.pack_start(gtk.Label(''), True)
+        vbox.pack_start(gtk.Label(''), False)
         
         self.CreateNameField(vbox)
         self.CreateURLField(vbox)
         self.CreateImagePicker(vbox)        
         
-        vbox.pack_start(gtk.Label(''), True)
+        vbox.pack_start(gtk.Label(''), False)
         
-        self.vbox.pack_start(vbox)
+        vbox.pack_start(gtk.HSeparator(), False);
         
+        vbox.pack_start(gtk.Label(''), False);
+        
+        self.vbox.pack_start(vbox, False)
+
     def CreatePreferences(self):        
         self.CreatePageEntry()
-        
+        self.CreateBottomButtons()
         
     def __init__(self):
         self.window = gtk.Window()
@@ -79,12 +84,13 @@ class PreferencesWindow:
         self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_MENU)
 
         self.window.set_position(gtk.WIN_POS_CENTER)
-        self.window.resize(500, 500)
+        #self.window.resize(500, 500)
+        self.window.set_default_size(500, 100)
         
         self.window.connect('destroy', self.DestroyWindow)
         self.vbox = gtk.VBox(False, 0)
         self.CreatePreferences()
-        self.vbox.pack_start(gtk.HSeparator())
-        self.CreateBottomButtons()
+        
+        
         self.window.add(self.vbox)
         self.window.show_all()

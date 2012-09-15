@@ -12,18 +12,27 @@ global configFile
 
 pages = dict()
 
-def CloseWindow(caller_widget):
+# Callbacks #
+def close_window(caller_widget):
     #future settings here to either just close the GUI
     #or kill the app entirely
     gtk.main_quit() 
     
-def CreatePreferencesWindow(caller_widget):
+def create_preferences_window(caller_widget):
     PreferencesWindow()
     
     
 def title_changed(webview, frame, title):
     global window
     window.set_title(title)
+    
+def button_clicked(button):
+    #ugly but works
+    buttonName = button.get_child().get_children()[1].get_label()
+    url = pages[buttonName][0]
+    global browser
+    browser.open(url)
+# End Callbacks #
 
 def CreateMenuBar(agr):
     menuBar = gtk.MenuBar()
@@ -33,7 +42,7 @@ def CreateMenuBar(agr):
     itemFile.set_submenu(fileMenu)    
 
     preferences = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES, agr)
-    preferences.connect("activate", CreatePreferencesWindow)
+    preferences.connect("activate", create_preferences_window)
     fileMenu.append(preferences)
 
     exit = gtk.ImageMenuItem(gtk.STOCK_CLOSE, agr)
@@ -86,13 +95,7 @@ def CreateButtonBar(win):
     CreateNavButton(buttonBar, gtk.STOCK_REFRESH)
     
     return buttonBar
-    
-def button_clicked(button):
-    #ugly but works
-    buttonName = button.get_child().get_children()[1].get_label()
-    url = pages[buttonName][0]
-    global browser
-    browser.open(url)
+
     
 def CreateWebBox():
     web = webkit.WebView()
@@ -100,12 +103,12 @@ def CreateWebBox():
     settings.set_property('enable-page-cache', True)
     return web
 
-def writeConfig():
+def WriteConfig():
     global configFile
     
     root = ET.Element("")
 
-def parseConfig():
+def ParseConfig():
     global configFile, window
     try:
         configFile = open('./config.xml')
@@ -124,7 +127,7 @@ def parseConfig():
     else:
         PreferencesWindow()
         
-def get_first(iterable, default=None):
+def GetFirst(iterable, default=None):
     if iterable:
         for item in iterable:
             return item
@@ -137,9 +140,9 @@ window = gtk.Window()
 window.set_position(gtk.WIN_POS_CENTER)
 window.resize(1024, 768)
 
-window.connect('destroy', CloseWindow)
+window.connect('destroy', close_window)
 
-parseConfig()
+ParseConfig()
 
 agr = gtk.AccelGroup()
 window.add_accel_group(agr)
