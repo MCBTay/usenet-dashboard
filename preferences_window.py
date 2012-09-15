@@ -89,21 +89,20 @@ class PreferencesWindow:
     def CreatePageEntry(self, name, url, img):
         vbox = gtk.VBox()
         vbox.set_spacing(10)
-        vbox.pack_start(gtk.Label(''), False)
+        #vbox.pack_start(gtk.Label(''), False)
         
         self.CreateNameField(vbox, name)
         self.CreateURLField(vbox, url)
         self.CreateImagePicker(vbox, img)        
-        
-        vbox.pack_start(gtk.Label(''), False)
+
         vbox.pack_start(gtk.HSeparator(), False)
-        vbox.pack_start(gtk.Label(''), False)
         
         self.vbox.pack_start(vbox, False)
     
 
     def CreatePreferences(self):   
         self.ParseConfig()
+        self.vbox.pack_start(gtk.Label(''), False)
         if self.configFile:
             for name in self.pages:
                 self.CreatePageEntry(name, self.pages[name][0], self.pages[name][1])
@@ -124,6 +123,7 @@ class PreferencesWindow:
         
         self.window.connect('destroy', self.destroy_window)
         self.vbox = gtk.VBox(False, 0)
+        self.vbox.set_spacing(15)
 
         self.CreatePreferences()
         
