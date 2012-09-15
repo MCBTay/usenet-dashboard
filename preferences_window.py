@@ -19,11 +19,9 @@ class PreferencesWindow:
         # update main window -- reload button names, imgs if applicable
         
     # order is only passed for the name text entry as it is the key to our dictionary
-    def entry_changed(self, caller_widget, label, order = None):
+    # name is passed in to know which record to update in the dictionary
+    def entry_changed(self, caller_widget, order = None, name = None):
         newText = caller_widget.get_text()
-        field = label.get_label
-        
-        page = None
         
         if order:
             page = self.findPageByOrder(int(order))
@@ -35,6 +33,11 @@ class PreferencesWindow:
             for tempField in self.pages.keys():
                 if tempField == page:
                     del(self.pages[tempField])
+        else: 
+            # so far URL is the only other case, so i'm handling it specifically
+            for tempField in self.pages.keys():
+                if tempField == name:
+                    self.pages[tempField][1] = newText 
             
             
         
@@ -49,7 +52,7 @@ class PreferencesWindow:
                 if int(pageOrder) == order:
                     winner = name
             count = count + 1
-            
+        
         return winner
         
     
@@ -164,7 +167,7 @@ class PreferencesWindow:
         nameLabel.set_width_chars(5)
         nameEntry = gtk.Entry()
         nameEntry.set_text(nameText)
-        nameEntry.connect('changed', self.entry_changed, nameLabel, order)
+        nameEntry.connect('changed', self.entry_changed, order)
         name.pack_start(nameLabel, False)
         name.pack_start(nameEntry)
         
@@ -173,20 +176,21 @@ class PreferencesWindow:
         name.pack_start(gtk.Label(''), False)
         vbox.pack_start(name, False)
         
-    def CreateURLField(self, vbox, urlText):
+    def CreateURLField(self, vbox, urlText, name):
         url = gtk.HBox()
         url.set_spacing(10)
         url.pack_start(gtk.Label(''), False)
         urlLabel = gtk.Label('URL')
         urlLabel.set_width_chars(5)
         urlEntry = gtk.Entry()
+        urlEntry.connect('changed', self.entry_changed, None, name)
         urlEntry.set_text(urlText)
         url.pack_start(urlLabel, False)
         url.pack_start(urlEntry, True)
         url.pack_start(gtk.Label(''), False)
         vbox.pack_start(url, False)
     
-    def CreateImagePicker(self, vbox, path):
+    def CreateImagePicker(self, vbox, path, name):
         img = gtk.HBox()
         img.set_spacing(10)
         img.pack_start(gtk.Label(''), False)
@@ -206,8 +210,8 @@ class PreferencesWindow:
         vbox.set_spacing(10)
         
         self.CreateNameField(vbox, name, order)
-        self.CreateURLField(vbox, url)
-        self.CreateImagePicker(vbox, img)        
+        self.CreateURLField(vbox, url, name)
+        self.CreateImagePicker(vbox, img, name)        
 
         vbox.pack_start(gtk.HSeparator(), False)
         
