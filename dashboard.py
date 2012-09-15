@@ -6,7 +6,7 @@ import string
 import xml.etree.ElementTree as ET
 from preferences_window import PreferencesWindow
 
-global menuBar, buttonBar, browser
+global menuBar, buttonBar, browser, progress
 global window
 global configFile
 
@@ -20,8 +20,7 @@ def close_window(caller_widget):
     
 def create_preferences_window(caller_widget):
     PreferencesWindow()
-    
-    
+     
 def title_changed(webview, frame, title):
     global window
     window.set_title(title)
@@ -32,21 +31,40 @@ def button_clicked(button):
     url = pages[buttonName][1]
     global browser
     browser.open(url)
+    
+def back_button_clicked(button):
+    print 'back'
+def forward_button_clicked(button):
+    print 'forward'
+def refresh_button_clicked(button):
+    print 'refresh'
+    
+def load_progress_changed(webview, amount):
+    global progress
+    progress.set_fraction(amount / 100.0)
+    
+def load_started(webview, frame):
+    global progress
+    progress.set_visible(True)
+    
+def load_finished(webview, frame):
+    global progress
+    progress.set_visible(False)
 # End Callbacks #
 
 def CreateMenuBar(agr):
     menuBar = gtk.MenuBar()
     
     fileMenu = gtk.Menu()
-    itemFile = gtk.MenuItem("File")
+    itemFile = gtk.MenuItem('File')
     itemFile.set_submenu(fileMenu)    
 
     preferences = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES, agr)
-    preferences.connect("activate", create_preferences_window)
+    preferences.connect('activate', create_preferences_window)
     fileMenu.append(preferences)
 
     exit = gtk.ImageMenuItem(gtk.STOCK_CLOSE, agr)
-    exit.connect("activate", gtk.main_quit)
+    exit.connect('activate', gtk.main_quit)
     fileMenu.append(exit)
     
     menuBar.append(itemFile)
@@ -68,7 +86,7 @@ def CreateButton(hbox, name):
     #vbox.pack_start(box)
     #vbox.pack_start(gtk.Label("Page title.......?"))
     button.add(box)
-    button.connect("clicked", button_clicked)
+    button.connect('clicked', button_clicked)
     
     hbox.pack_start(button, False)
     
@@ -78,6 +96,7 @@ def CreateNavButton(hbox, icon):
     button = gtk.Button()
     button.add(image)
     hbox.pack_start(button, False)
+    return button
      
 def CreateButtonBar(win):
     global configFile, buttonBar 
@@ -94,10 +113,12 @@ def CreateButtonBar(win):
     
     buttonBar.pack_start(gtk.Label(''), True, False)
 
-    CreateNavButton(buttonBar, gtk.STOCK_GO_BACK)
-    CreateNavButton(buttonBar, gtk.STOCK_GO_FORWARD)
-    CreateNavButton(buttonBar, gtk.STOCK_REFRESH)
-    
+    back    = CreateNavButton(buttonBar, gtk.STOCK_GO_BACK)
+    back.connect('clicked', back_button_clicked)
+    forward = CreateNavButton(buttonBar, gtk.STOCK_GO_FORWARD)
+    forward.connect('clicked', forward_button_clicked)
+    refresh = CreateNavButton(buttonBar, gtk.STOCK_REFRESH)
+    refresh.connect('clicked', refresh_button_clicked)    
     return buttonBar
 
     
@@ -159,14 +180,20 @@ if configFile:
     browser.open(url)
     
 browser.connect('title-changed', title_changed)
+browser.connect('load-started', load_started)
+browser.connect('load-progress-changed', load_progress_changed)
+browser.connect('load-finished', load_finished)
 
 scroller = gtk.ScrolledWindow()
 scroller.add(browser)
+
+progress = gtk.ProgressBar()
 
 vbox = gtk.VBox(False, 2)
 vbox.pack_start(menuBar, False, False, 0)
 vbox.pack_start(hbox, False, False, 0)
 vbox.pack_start(scroller)
+vbox.pack_start(progress, False)
 window.add(vbox)
 window.show_all()
 gtk.main()
