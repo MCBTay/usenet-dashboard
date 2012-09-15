@@ -19,11 +19,7 @@ class PreferencesWindow:
 
         self.vbox.pack_start(hbox, False)
         
-    def CreatePageEntry(self):
-        vbox = gtk.VBox()
-        vbox.set_spacing(10)
-        vbox.pack_start(gtk.Label(''), True)
-        
+    def CreateNameField(self, vbox):
         name = gtk.HBox()
         name.set_spacing(10)
         name.pack_start(gtk.Label(''), False)
@@ -35,6 +31,7 @@ class PreferencesWindow:
         name.pack_start(gtk.Label(''), False)
         vbox.pack_start(name, False)
         
+    def CreateURLField(self, vbox):
         url = gtk.HBox()
         url.set_spacing(10)
         url.pack_start(gtk.Label(''), False)
@@ -45,7 +42,8 @@ class PreferencesWindow:
         url.pack_start(urlEntry, True)
         url.pack_start(gtk.Label(''), False)
         vbox.pack_start(url, False)
-        
+    
+    def CreateImagePicker(self, vbox):
         img = gtk.HBox()
         img.set_spacing(10)
         img.pack_start(gtk.Label(''), False)
@@ -56,6 +54,16 @@ class PreferencesWindow:
         img.pack_start(imgChooser)
         img.pack_start(gtk.Label(''), False)
         vbox.pack_start(img, False)
+    
+        
+    def CreatePageEntry(self):
+        vbox = gtk.VBox()
+        vbox.set_spacing(10)
+        vbox.pack_start(gtk.Label(''), True)
+        
+        self.CreateNameField(vbox)
+        self.CreateURLField(vbox)
+        self.CreateImagePicker(vbox)        
         
         vbox.pack_start(gtk.Label(''), True)
         
