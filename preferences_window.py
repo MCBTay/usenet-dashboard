@@ -16,7 +16,42 @@ class PreferencesWindow:
     def save_preferences(self, caller_widget):
         self.WriteConfig()
         self.window.destroy()
+        # update main window -- reload button names, imgs if applicable
+        
+    # order is only passed for the name text entry as it is the key to our dictionary
+    def entry_changed(self, caller_widget, label, order = None):
+        newText = caller_widget.get_text()
+        field = label.get_label
+        
+        page = None
+        
+        if order:
+            page = self.findPageByOrder(int(order))
+            # since we can't change keys, we'll have to create a new entry and delete the old one
+            storedOrder = self.pages[page][0]
+            storedUrl   = self.pages[page][1]
+            storedImg   = self.pages[page][2]
+            self.pages[newText] = [storedOrder, storedUrl, storedImg]
+            for tempField in self.pages.keys():
+                if tempField == page:
+                    del(self.pages[tempField])
+            
+            
+        
     # End Callbacks #
+    
+    def findPageByOrder(self, order):
+        winner = None
+        count = 1
+        while count <= len(self.pages):
+            for name in self.pages:
+                pageOrder = self.pages[name][0]
+                if int(pageOrder) == order:
+                    winner = name
+            count = count + 1
+            
+        return winner
+        
     
     def PrettyPrint(self, elem, level=0):
         i = "\n" + level*"  "
@@ -129,6 +164,7 @@ class PreferencesWindow:
         nameLabel.set_width_chars(5)
         nameEntry = gtk.Entry()
         nameEntry.set_text(nameText)
+        nameEntry.connect('changed', self.entry_changed, nameLabel, order)
         name.pack_start(nameLabel, False)
         name.pack_start(nameEntry)
         
