@@ -1,37 +1,12 @@
 <pages>
   <page>
-    <name>sabnzbd+</name>
-    <url>http://192.168.0.17:8080</url>
-    <enabled>1</enabled>
+    <name>SABnzbd+</name>
+    <url>http://localhost:8080/sabnzbd/</url>
+    <img>./img/sabnzbd.png</img>
   </page>
   <page>
-    <name>sick beard</name>
+    <name>Sick Beard</name>
     <url>http://localhost:8081/home/</url>
-    <enabled>0</enabled>
-  </page>
-  <page>
-    <name>couch potato</name>
-    <url>http://192.168.0.17:5000/movie/</url>
-    <enabled>0</enabled>
-  </page>
-  <page>
-    <name>headphones</name>
-    <url>http://192.168.0.17:8181</url>
-    <enabled>1</enabled>
-  </page>
-  <page>
-    <name>nzbmatrix</name>
-    <url>http://nzbmatrix.com/index.php</url>
-    <enabled>1</enabled>
-  </page>
-  <page>
-    <name>dognzb</name>
-    <url>https://dognzb.cr/browse</url>
-    <enabled>1</enabled>
-  </page>
-  <page>
-    <name>nzbs.org</name>
-    <url>http://nzbs.org</url>
-    <enabled>1</enabled>
+    <img>./img/sickbeard.png</img>
   </page>
 </pages>
