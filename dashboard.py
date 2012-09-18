@@ -23,7 +23,7 @@ def create_preferences_window(caller_widget):
      
 def title_changed(webview, frame, title):
     global window
-    window.set_title(title)
+    window.set_title(title, "./img/icon.png")
     
 def button_clicked(button):
     #ugly but works
@@ -156,10 +156,9 @@ def GetFirst(iterable, default=None):
             return item
     return default
         
-
-      
+            
 window = gtk.Window()
-
+window.set_icon_from_file('./img/icon.png');
 window.set_position(gtk.WIN_POS_CENTER)
 window.resize(1024, 768)
 
