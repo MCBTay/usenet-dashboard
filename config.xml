@@ -1,20 +1,8 @@
 <pages>
   <page>
-    <order>2</order>
+    <order>0</order>
     <name>SABnzbd+</name>
     <url>http://localhost:8080/sabnzbd/</url>
-    <img>/home/mcbtay/dev/usenet-dashboard/img/sabnzbd.png</img>
-  </page>
-  <page>
-    <order>3</order>
-    <name>Sick Beard</name>
-    <url>http://localhost:8081/home/</url>
-    <img>/home/mcbtay/dev/usenet-dashboard/img/sickbeard.png</img>
-  </page>
-  <page>
-    <order>1</order>
-    <name>CouchPotato</name>
-    <url>http://localhost:5000/movie/</url>
-    <img>/home/mcbtay/dev/usenet-dashboard/img/couchpotato.png</img>
+    <img></img>
   </page>
 </pages>
