@@ -48,6 +48,39 @@ def load_started(webview, frame):
 def load_finished(webview, frame):
     global progress
     progress.set_visible(False)
+    
+def create_about_window(caller_widget):
+    about = gtk.Window()
+    vbox = gtk.VBox(False, 2)
+    vbox.set_spacing(15)
+    about.set_title('About')
+    about.set_position(gtk.WIN_POS_CENTER)
+    about.set_default_size(500, 100)
+    
+    icon = gtk.Image()
+    icon.set_from_file('./img/icon.svg')
+    
+    version = 'Version 1.0?'
+    versionLabel = gtk.Label(version)
+    
+    names = 'written by Bryan Taylor and Spencer Smith'
+    namesLabel = gtk.Label(names)
+    
+    githubLink = 'http://github.com/MCBTay/usenet-dashboard'
+    githubLabel = gtk.Label(githubLink)
+    
+    description = 'A dashboard for managing all usenet-related windows in one easy spot.'
+    descriptionLabel = gtk.Label(description)
+    
+    vbox.pack_start(gtk.Label(''))
+    vbox.pack_start(icon)
+    vbox.pack_start(versionLabel)
+    vbox.pack_start(namesLabel)
+    vbox.pack_start(githubLabel)
+    vbox.pack_start(descriptionLabel)
+    vbox.pack_start(gtk.Label(''))
+    about.add(vbox)
+    about.show_all()
 # End Callbacks #
 
 def CreateMenuBar(agr):
@@ -56,6 +89,10 @@ def CreateMenuBar(agr):
     fileMenu = gtk.Menu()
     itemFile = gtk.MenuItem('File')
     itemFile.set_submenu(fileMenu)    
+    
+    about = gtk.ImageMenuItem(gtk.STOCK_ABOUT, agr)
+    about.connect('activate', create_about_window)
+    fileMenu.append(about)
 
     preferences = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES, agr)
     preferences.connect('activate', create_preferences_window)
