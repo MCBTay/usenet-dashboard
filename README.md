@@ -1,7 +1,6 @@
 ================
 usenet-dashboard
 ================
-
 A dashboard for managing all usenet-related windows in one easy spot.
 
 ================
@@ -12,7 +11,6 @@ python, python-webkit
 ================
 Usage
 ================
-
 1. 'sudo chmod +x dashboard.py'
 2. './dashboard.py'
 3. Add desired tabs by going to File > Preferences.
@@ -20,7 +18,6 @@ Usage
 =================
 Licensing
 =================
-
 (The MIT License)
 
 Copyright (c) 2012 Bryan Taylor <mcbtay@gmail.com>, Spencer Smith <rsmitty1025@gmail.com>
