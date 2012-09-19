@@ -68,6 +68,8 @@ def create_about_window(caller_widget):
     
     githubLink = 'http://github.com/MCBTay/usenet-dashboard'
     githubLabel = gtk.Label(githubLink)
+    githubLabel.set_markup('<a href="http://github.com/MCBTay/usenet-dashboard">http://github.com/MCBTay/usenet-dashboard</a>');
+    #githubLink = gtk.LinkButton('http://github.com/MCBTay/usenet-dashboard')
     
     description = 'A dashboard for managing all usenet-related windows in one easy spot.'
     descriptionLabel = gtk.Label(description)
