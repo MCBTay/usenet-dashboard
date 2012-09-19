@@ -12,9 +12,10 @@ python, python-webkit
 ================
 Usage
 ================
-1. Set desired urls in pagesconfig.py
-2. 'sudo chmod +x dashboard.py'
-3. './dashboard.py'
+
+1. 'sudo chmod +x dashboard.py'
+2. './dashboard.py'
+3. Add desired tabs by going to File > Preferences.
 
 =================
 Licensing
