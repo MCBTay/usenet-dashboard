@@ -55,9 +55,7 @@ class PreferencesWindow:
         dialog.show_all()
         if (dialog.run() == gtk.RESPONSE_ACCEPT):
             if (self.pages[nameText]):
-                print self.pages
                 del(self.pages[nameText])
-                print self.pages
                 self.RedrawPreferences()
         dialog.destroy()
     # End Callbacks #
@@ -67,6 +65,7 @@ class PreferencesWindow:
             self.vbox.remove(child)
         self.CreatePreferences()
         self.vbox.show_all()
+        self.window.resize(1, 1)
     
     def findPageByOrder(self, order):
         winner = None
@@ -275,6 +274,7 @@ class PreferencesWindow:
         self.window.set_position(gtk.WIN_POS_CENTER)
         #self.window.resize(500, 500)
         self.window.set_default_size(500, 100)
+        self.window.resize(1, 1)
         
         self.window.connect('destroy', self.destroy_window)
         self.vbox = gtk.VBox(False, 0)
