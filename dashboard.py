@@ -3,6 +3,7 @@
 import gtk
 import webkit
 import string
+import operator
 import xml.etree.ElementTree as ET
 from preferences_window import PreferencesWindow
 
@@ -14,8 +15,6 @@ pages = dict()
 
 # Callbacks #
 def close_window(caller_widget):
-    #future settings here to either just close the GUI
-    #or kill the app entirely
     gtk.main_quit() 
     
 def create_preferences_window(caller_widget):
@@ -23,7 +22,7 @@ def create_preferences_window(caller_widget):
      
 def title_changed(webview, frame, title):
     global window
-    window.set_title(title, "./img/icon.png")
+    window.set_title(title)
     
 def button_clicked(button):
     #ugly but works
@@ -74,7 +73,6 @@ def CreateMenuBar(agr):
     return menuBar
     
 def CreateButton(hbox, name):
-    #vbox = gtk.VBox(False, 0)
     box = gtk.HBox(False, 0)
     
     image = gtk.Image()
@@ -86,8 +84,6 @@ def CreateButton(hbox, name):
     box.pack_start(label, False)
     
     button = gtk.Button()
-    #vbox.pack_start(box)
-    #vbox.pack_start(gtk.Label("Page title.......?"))
     button.add(box)
     button.connect('clicked', button_clicked)
     
@@ -107,12 +103,9 @@ def CreateButtonBar(win):
     buttonBar = gtk.HBox(False, 5)
     
     if configFile:
-        count = 1
-        while count <= len(pages):
-            for page in pages:
-                if int(pages[page][0]) == count:
-                    CreateButton(buttonBar, page)
-            count = count + 1
+        sorted_pages = sorted(pages.iteritems(), key=operator.itemgetter(1))
+        for page in sorted_pages:
+            CreateButton(buttonBar, page[0])
     
     buttonBar.pack_start(gtk.Label(''), True, False)
 

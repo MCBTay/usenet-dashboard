@@ -1,4 +1,5 @@
 import gtk
+import operator
 import xml.etree.ElementTree as ET
 import xml.dom.minidom
 
@@ -44,9 +45,28 @@ class PreferencesWindow:
         
     def filechooser_changed(self, caller_widget, name = None):
         newImg = caller_widget.get_filename()
-        self.pages[name][2] = newImg
+        self.pages[name][2] = newImg    
         
+    def delete_clicked(self, caller_widget, nameText):
+        labelString = 'Are you sure you want to delete your entry for ' + nameText + '?'
+        dialog = gtk.Dialog('Are you sure?', None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, (gtk.STOCK_OK, gtk.RESPONSE_ACCEPT, gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
+        dialog.vbox.set_spacing(10)
+        dialog.vbox.pack_start(gtk.Label(labelString))
+        dialog.show_all()
+        if (dialog.run() == gtk.RESPONSE_ACCEPT):
+            if (self.pages[nameText]):
+                print self.pages
+                del(self.pages[nameText])
+                print self.pages
+                self.RedrawPreferences()
+        dialog.destroy()
     # End Callbacks #
+    
+    def RedrawPreferences(self):
+        for child in self.vbox.get_children():
+            self.vbox.remove(child)
+        self.CreatePreferences()
+        self.vbox.show_all()
     
     def findPageByOrder(self, order):
         winner = None
@@ -56,11 +76,9 @@ class PreferencesWindow:
                 pageOrder = self.pages[name][0]
                 if int(pageOrder) == order:
                     winner = name
-            count = count + 1
-        
+            count = count + 1 
         return winner
         
-    
     def PrettyPrint(self, elem, level=0):
         i = "\n" + level*"  "
         if len(elem):
@@ -107,9 +125,7 @@ class PreferencesWindow:
         self.PrettyPrint(root)
         
         tree.write('./config.xml')
-            
-    
-    
+              
     def ParseConfig(self):
         try:
             self.configFile = open('./config.xml')
@@ -165,6 +181,14 @@ class PreferencesWindow:
         
         box.pack_start(orderDropdown, True)
         
+    def CreateDeleteButton(self, name, nameText):
+        delete = gtk.Button()
+        image = gtk.Image()
+        image.set_from_stock(gtk.STOCK_CLOSE, 32)
+        delete.set_image(image)
+        name.pack_start(delete, False)
+        delete.connect('clicked', self.delete_clicked, nameText)
+        
     def CreateNameField(self, vbox, nameText, order):
         name = gtk.HBox()
         name.set_spacing(10)
@@ -178,6 +202,7 @@ class PreferencesWindow:
         name.pack_start(nameEntry)
         
         self.CreateOrderSelector(name, order, nameText)
+        self.CreateDeleteButton(name, nameText)
         
         name.pack_start(gtk.Label(''), False)
         vbox.pack_start(name, False)
@@ -225,19 +250,18 @@ class PreferencesWindow:
         self.vbox.pack_start(vbox, False)
     
     def CreatePreferences(self):   
-        self.ParseConfig()
+        
         self.vbox.pack_start(gtk.Label(''), False)
         
         if self.configFile:
-            count = 1
-            while count <= len(self.pages):
-                for name in self.pages:
-                    order = self.pages[name][0]
-                    url   = self.pages[name][1]
-                    img   = self.pages[name][2]
-                    if int(order) == count:
-                        self.CreatePageEntry(order, name, url, img)
-                count = count + 1
+            sorted_pages = sorted(self.pages.iteritems(), key=operator.itemgetter(1))
+            for page in sorted_pages:
+                pageName = page[0]
+  
+                order = self.pages[pageName][0]
+                url   = self.pages[pageName][1]
+                img   = self.pages[pageName][2]
+                self.CreatePageEntry(order, pageName, url, img)
         else:
             self.CreatePageEntry('1', '', '', '.')
             
@@ -256,6 +280,7 @@ class PreferencesWindow:
         self.vbox = gtk.VBox(False, 0)
         self.vbox.set_spacing(15)
 
+        self.ParseConfig()
         self.CreatePreferences()
         
         
