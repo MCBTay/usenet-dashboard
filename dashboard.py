@@ -147,7 +147,7 @@ def GetFirst(iterable, default=None):
         
             
 window = gtk.Window()
-window.set_icon_from_file('./img/icon.png');
+window.set_icon_from_file('./img/icon.svg');
 window.set_position(gtk.WIN_POS_CENTER)
 window.resize(1024, 768)
 window.set_title('Usenet Dashboard')
