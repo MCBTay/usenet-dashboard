@@ -19,10 +19,6 @@ def close_window(caller_widget):
     
 def create_preferences_window(caller_widget):
     PreferencesWindow()
-     
-def title_changed(webview, frame, title):
-    global window
-    window.set_title(title)
     
 def button_clicked(button):
     #ugly but works
@@ -154,7 +150,7 @@ window = gtk.Window()
 window.set_icon_from_file('./img/icon.png');
 window.set_position(gtk.WIN_POS_CENTER)
 window.resize(1024, 768)
-
+window.set_title('Usenet Dashboard')
 window.connect('destroy', close_window)
 
 ParseConfig()
@@ -174,7 +170,6 @@ if configFile:
     url = pages[buttonName][1]
     browser.open(url)
     
-browser.connect('title-changed', title_changed)
 browser.connect('load-started', load_started)
 browser.connect('load-progress-changed', load_progress_changed)
 browser.connect('load-finished', load_finished)
