@@ -1,3 +1,4 @@
+import os
 import gtk
 import operator
 import xml.etree.ElementTree as ET
@@ -95,7 +96,7 @@ class PreferencesWindow:
     
     def WriteConfig(self):
         try:
-            self.configFile = open('./config.xml', 'w+')
+            self.configFile = open(os.path.dirname(__file__) + '/config.xml', 'w+')
         except IOError:
             print "exception"
             
@@ -127,12 +128,12 @@ class PreferencesWindow:
               
     def ParseConfig(self):
         try:
-            self.configFile = open('./config.xml')
+            self.configFile = open(os.path.dirname(__file__) + '/config.xml')
         except IOError:
            return
 
         if self.configFile:
-            tree = ET.parse('config.xml')
+            tree = ET.parse(os.path.dirname(__file__) + '/config.xml')
             root = tree.getroot()
             for page in root.findall('page'):
               name  = page.find('name').text
