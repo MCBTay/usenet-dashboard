@@ -37,6 +37,12 @@ def refresh_button_clicked(button):
     global browser
     browser.reload()
     
+def download_requested(webview, download):
+    print 'trying to download', download
+    download.set_destination_uri('.')
+    download.start()
+    return True
+    
 def load_progress_changed(webview, amount):
     global progress
     progress.set_fraction(amount / 100.0)
@@ -83,6 +89,13 @@ def create_about_window(caller_widget):
     vbox.pack_start(gtk.Label(''))
     about.add(vbox)
     about.show_all()
+
+def on_key_press(caller_widget, event):
+    global browser
+    keyname = gtk.gdk.keyval_name(event.keyval)
+    if keyname == 'F5':
+        browser.reload()
+
 # End Callbacks #
 
 def CreateMenuBar(agr):
@@ -191,6 +204,7 @@ window.set_position(gtk.WIN_POS_CENTER)
 window.resize(1024, 768)
 window.set_title('Usenet Dashboard')
 window.connect('destroy', close_window)
+window.connect('key_press_event', on_key_press)
 
 ParseConfig()
 
@@ -212,6 +226,7 @@ if configFile:
 browser.connect('load-started', load_started)
 browser.connect('load-progress-changed', load_progress_changed)
 browser.connect('load-finished', load_finished)
+browser.connect('download-requested', download_requested)
 
 scroller = gtk.ScrolledWindow()
 scroller.add(browser)
