@@ -68,13 +68,6 @@ class PreferencesWindow:
         self.vbox.show_all()
         self.window.resize(1, 1)
     
-    def RedrawPreferences(self):
-        for child in self.vbox.get_children():
-            self.vbox.remove(child)
-        self.CreatePreferences()
-        self.vbox.show_all()
-        self.window.resize(1, 1)
-    
     def findPageByOrder(self, order):
         winner = None
         count = 1
