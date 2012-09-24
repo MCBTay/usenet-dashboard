@@ -6,6 +6,7 @@ import xml.dom.minidom
 
 class PreferencesWindow:
     pages = dict()
+    page_entries = dict()
     configFile = None
 
     # Callbacks #
@@ -57,9 +58,15 @@ class PreferencesWindow:
         if (dialog.run() == gtk.RESPONSE_ACCEPT):
             if (self.pages[nameText]):
                 del(self.pages[nameText])
-                self.RedrawPreferences()
+                self.RemoveEntry(nameText)
         dialog.destroy()
     # End Callbacks #
+    
+    def RemoveEntry(self, name):
+        if (self.page_entries[name]):
+            self.vbox.remove(self.page_entries[name])
+        self.vbox.show_all()
+        self.window.resize(1, 1)
     
     def RedrawPreferences(self):
         for child in self.vbox.get_children():
@@ -250,6 +257,7 @@ class PreferencesWindow:
         vbox.pack_start(gtk.HSeparator(), False)
         
         self.vbox.pack_start(vbox, False)
+        self.page_entries[name] = vbox
     
     def CreatePreferences(self):   
         
