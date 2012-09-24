@@ -95,8 +95,9 @@ class PreferencesWindow:
                 elem.tail = i
     
     def WriteConfig(self):
+        configFilepath = os.path.join(os.path.dirname(__file__), 'config.xml')
         try:
-            self.configFile = open(os.path.dirname(__file__) + '/config.xml', 'w+')
+            self.configFile = open(configFilepath, 'w+')
         except IOError:
             print "exception"
             
@@ -124,16 +125,17 @@ class PreferencesWindow:
         
         self.PrettyPrint(root)
         
-        tree.write(os.path.dirname(__file__) + '/config.xml')
+        tree.write(configFilepath)
               
     def ParseConfig(self):
+        configFilepath = os.path.join(os.path.dirname(__file__), 'config.xml')
         try:
-            self.configFile = open(os.path.dirname(__file__) + '/config.xml')
+            self.configFile = open(configFilepath)
         except IOError:
            return
 
         if self.configFile:
-            tree = ET.parse(os.path.dirname(__file__) + '/config.xml')
+            tree = ET.parse(configFilepath)
             root = tree.getroot()
             for page in root.findall('page'):
               name  = page.find('name').text
