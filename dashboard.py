@@ -98,28 +98,6 @@ def on_key_press(caller_widget, event):
         browser.reload()
 
 # End Callbacks #
-
-def CreateMenuBar(agr):
-    menuBar = gtk.MenuBar()
-    
-    fileMenu = gtk.Menu()
-    itemFile = gtk.MenuItem('File')
-    itemFile.set_submenu(fileMenu)    
-    
-    about = gtk.ImageMenuItem(gtk.STOCK_ABOUT, agr)
-    about.connect('activate', create_about_window)
-    fileMenu.append(about)
-
-    preferences = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES, agr)
-    preferences.connect('activate', create_preferences_window)
-    fileMenu.append(preferences)
-
-    exit = gtk.ImageMenuItem(gtk.STOCK_CLOSE, agr)
-    exit.connect('activate', gtk.main_quit)
-    fileMenu.append(exit)
-    
-    menuBar.append(itemFile)
-    return menuBar
     
 def CreateButton(hbox, name):
     box = gtk.HBox(False, 0)
@@ -157,6 +135,12 @@ def CreateButtonBar(win):
             CreateButton(buttonBar, page[0])
     
     buttonBar.pack_start(gtk.Label(''), True, False)
+    
+    about = CreateNavButton(buttonBar, gtk.STOCK_ABOUT)
+    about.connect('clicked', create_about_window)
+    
+    settings = CreateNavButton(buttonBar, gtk.STOCK_PREFERENCES)
+    settings.connect('clicked', create_preferences_window)
 
     back    = CreateNavButton(buttonBar, gtk.STOCK_GO_BACK)
     back.connect('clicked', back_button_clicked)
@@ -211,7 +195,6 @@ ParseConfig()
 
 agr = gtk.AccelGroup()
 window.add_accel_group(agr)
-menuBar = CreateMenuBar(agr)
 hbox = CreateButtonBar(window)
 
 browser = CreateWebBox()
@@ -235,7 +218,6 @@ scroller.add(browser)
 progress = gtk.ProgressBar()
 
 vbox = gtk.VBox(False, 2)
-vbox.pack_start(menuBar, False, False, 0)
 vbox.pack_start(hbox, False, False, 0)
 vbox.pack_start(scroller)
 vbox.pack_start(progress, False)
