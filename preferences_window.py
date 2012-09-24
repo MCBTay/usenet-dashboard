@@ -124,7 +124,7 @@ class PreferencesWindow:
         
         self.PrettyPrint(root)
         
-        tree.write('./config.xml')
+        tree.write(os.path.dirname(__file__) + '/config.xml')
               
     def ParseConfig(self):
         try:
