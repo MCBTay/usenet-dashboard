@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os
+import os, sys, inspect
 import gtk
 import webkit
 import string
@@ -65,7 +65,8 @@ def create_about_window(caller_widget):
     about.set_default_size(500, 100)
     
     icon = gtk.Image()
-    icon.set_from_file(os.path.dirname(__file__) + '/img/icon.svg')
+    iconFilepath = os.path.join(os.path.dirname(__file__), 'img/icon.svg')
+    icon.set_from_file(iconFilepath)
     
     version = 'Version 1.0?'
     versionLabel = gtk.Label(version)
@@ -159,13 +160,14 @@ def CreateWebBox():
 
 def ParseConfig():
     global configFile, window
+    configFilepath = os.path.join(os.path.dirname(__file__), 'config.xml')
     try:
-        configFile = open(os.path.dirname(__file__) + '/config.xml')
+        configFile = open(configFilepath)
     except IOError:
        configFile = None
 
     if configFile:
-        tree = ET.parse(os.path.dirname(__file__) + '/config.xml')
+        tree = ET.parse(configFilepath)
         root = tree.getroot()
         for page in root.findall('page'):
           name = page.find('name').text
@@ -184,7 +186,8 @@ def GetFirst(iterable, default=None):
         
             
 window = gtk.Window()
-window.set_icon_from_file(os.path.dirname(__file__)+'/img/icon.svg');
+iconFilepath = os.path.join(os.path.dirname(__file__), 'img/icon.svg')
+window.set_icon_from_file(iconFilepath);
 window.set_position(gtk.WIN_POS_CENTER)
 window.resize(1024, 768)
 window.set_title('Usenet Dashboard')
