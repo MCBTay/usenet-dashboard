@@ -35,19 +35,19 @@ def WriteConfig(pages):
         url   = pages[name][1]
         img   = pages[name][2]
 
-        pageNode = ET.SubElement(root, 'page')
+        page_node = ET.SubElement(root, 'page')
         
-        orderNode = ET.SubElement(pageNode, 'order')
-        orderNode.text = order
+        order_node = ET.SubElement(page_node, 'order')
+        order_node.text = order
         
-        nameNode = ET.SubElement(pageNode, 'name')
-        nameNode.text = name
+        name_node = ET.SubElement(page_node, 'name')
+        name_node.text = name
         
-        urlNode = ET.SubElement(pageNode, 'url')
-        urlNode.text = url
+        url_node = ET.SubElement(page_node, 'url')
+        url_node.text = url
         
-        imgNode = ET.SubElement(pageNode, 'img')                        
-        imgNode.text = img
+        img_node = ET.SubElement(page_node, 'img')                        
+        img_node.text = img
     
     tree = ET.ElementTree(root)
     PrettyPrint(root)
