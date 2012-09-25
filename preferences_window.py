@@ -1,5 +1,5 @@
 import os
-import gtk
+import gtk, gobject
 import operator
 import xml.etree.ElementTree as ET
 import xml.dom.minidom
@@ -65,7 +65,6 @@ class PreferencesWindow:
         dialog.destroy()
         
     def add_clicked(self, caller_widget):
-        #popup asking name
         labelString = 'What would you like to call the new site?'
         dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, labelString)
         
@@ -92,11 +91,32 @@ class PreferencesWindow:
             self.pages[new_site_name] = ['', '', '']
             self.CreatePageEntry(str(highest+1), new_site_name, '', '')
             
-            # now since all page entries are created, need to update the combo boxes
+            self.UpdateComboBoxes()
+            
                 
             self.vbox.show_all()
         dialog.destroy()
     # End Callbacks #
+    
+    def UpdateComboBoxes(self):
+        comboboxes = list()
+        for entry in self.entry_vbox.get_children():
+            for row in entry.get_children():
+                for child in row.get_children():
+                    if type(child) == gtk.ComboBox:
+                        comboboxes.append(child)       
+                break # combo box is always in first row of entry
+                
+        liststore = gtk.ListStore(str)
+        count = 1
+        while count <= len(comboboxes):
+            liststore.append(str(count))
+            count = count + 1
+            
+        for cb in comboboxes:
+            oldactive = cb.get_active()
+            cb.set_model(liststore)
+            cb.set_active(oldactive)
     
     def RemoveEntry(self, name):
         if (self.page_entries[name]):
