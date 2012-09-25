@@ -88,25 +88,10 @@ class PreferencesWindow:
                     highest = int(self.pages[page][0])
             self.pages[new_site_name] = ['', '', '']
             self.CreatePageEntry(str(highest+1), new_site_name, '', '')
-            self.vbox.show_all()
             
-        #determine order
-        #create the entry
-        
-#        temp_title = 'New Site'
-#        try:
-#           temp_list = self.pages[temp_title]
-#           temp_title = temp_title + ' ' + str(self.count)
-#           self.count = self.count + 1
-#        except KeyError:
-#            pass
-#        
-#        highest = 0
-#        for page in self.pages.keys():
-#            if int(self.pages[page][0]) > highest:
-#                highest = int(self.pages[page][0])
-#        self.pages[temp_title] = ['', '', '']        
-#        self.CreatePageEntry(str(highest+1), temp_title, 'www.example.com', '.') 
+            # now since all page entries are created, need to update the combo boxes
+                
+            self.vbox.show_all()
 
     def new_dialog_response(self, caller_widget, dialog, response):
         print caller_widget.get_text()
@@ -115,7 +100,7 @@ class PreferencesWindow:
     
     def RemoveEntry(self, name):
         if (self.page_entries[name]):
-            self.vbox.remove(self.page_entries[name])
+            self.entry_vbox.remove(self.page_entries[name])
         self.vbox.show_all()
         self.window.resize(1, 1)
     
@@ -157,7 +142,6 @@ class PreferencesWindow:
             order = self.pages[name][0]
             url   = self.pages[name][1]
             img   = self.pages[name][2]
-            print name + '-' + order + '-' + url + '-' + img
  
             pageNode = ET.SubElement(root, 'page')
             
