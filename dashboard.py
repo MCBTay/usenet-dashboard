@@ -7,6 +7,7 @@ import string
 import operator
 import xml.etree.ElementTree as ET
 from preferences_window import PreferencesWindow
+from about_window import AboutWindow
 
 global menuBar, buttonBar, browser, progress
 global window
@@ -57,40 +58,7 @@ def load_finished(webview, frame):
     progress.set_visible(False)
     
 def create_about_window(caller_widget):
-    about = gtk.Window()
-    vbox = gtk.VBox(False, 2)
-    vbox.set_spacing(15)
-    about.set_title('About')
-    about.set_position(gtk.WIN_POS_CENTER)
-    about.set_default_size(500, 100)
-    
-    icon = gtk.Image()
-    iconFilepath = os.path.join(os.path.dirname(__file__), 'img/icon.svg')
-    icon.set_from_file(iconFilepath)
-    
-    version = 'Version 1.0?'
-    versionLabel = gtk.Label(version)
-    
-    names = 'written by Bryan Taylor and Spencer Smith'
-    namesLabel = gtk.Label(names)
-    
-    githubLink = 'http://github.com/MCBTay/usenet-dashboard'
-    githubLabel = gtk.Label(githubLink)
-    githubLabel.set_markup('<a href="http://github.com/MCBTay/usenet-dashboard">http://github.com/MCBTay/usenet-dashboard</a>');
-    #githubLink = gtk.LinkButton('http://github.com/MCBTay/usenet-dashboard')
-    
-    description = 'A dashboard for managing all usenet-related windows in one easy spot.'
-    descriptionLabel = gtk.Label(description)
-    
-    vbox.pack_start(gtk.Label(''))
-    vbox.pack_start(icon)
-    vbox.pack_start(versionLabel)
-    vbox.pack_start(namesLabel)
-    vbox.pack_start(githubLabel)
-    vbox.pack_start(descriptionLabel)
-    vbox.pack_start(gtk.Label(''))
-    about.add(vbox)
-    about.show_all()
+    AboutWindow()
 
 def on_key_press(caller_widget, event):
     global browser
