@@ -119,7 +119,7 @@ def CreateButton(hbox, name):
     
 def CreateNavButton(hbox, icon):
     image = gtk.Image()
-    image.set_from_stock(icon, 4)
+    image.set_from_stock(icon, 3)
     button = gtk.Button()
     button.add(image)
     hbox.pack_start(button, False)
