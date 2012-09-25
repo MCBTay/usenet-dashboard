@@ -70,7 +70,7 @@ class PreferencesWindow:
         dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, labelString)
         
         entry = gtk.Entry()
-        entry.connect("activate", self.new_dialog_response, dialog, gtk.RESPONSE_OK)
+        entry.connect('activate', self.new_dialog_response, dialog, gtk.RESPONSE_OK)
         hbox = gtk.HBox()
         hbox.pack_start(entry)
         dialog.vbox.pack_end(hbox, True, True, 0)
@@ -79,8 +79,11 @@ class PreferencesWindow:
         new_site_name = ''
         if response == gtk.RESPONSE_OK:
             new_site_name = entry.get_text()
+            entry.emit('activate')
         dialog.destroy()
-        
+
+    def new_dialog_response(self, caller_widget, dialog, response):
+        new_site_name = caller_widget.get_text()
         if new_site_name != '':
             highest = 0
             for page in self.pages.keys():
@@ -92,9 +95,6 @@ class PreferencesWindow:
             # now since all page entries are created, need to update the combo boxes
                 
             self.vbox.show_all()
-
-    def new_dialog_response(self, caller_widget, dialog, response):
-        print caller_widget.get_text()
         dialog.destroy()
     # End Callbacks #
     
