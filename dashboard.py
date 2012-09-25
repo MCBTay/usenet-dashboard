@@ -8,10 +8,10 @@ import operator
 import xml.etree.ElementTree as ET
 from preferences_window import PreferencesWindow
 from about_window import AboutWindow
+import dashboard_common
 
 global menuBar, buttonBar, browser, progress
 global window
-global configFile
 
 pages = dict()
 
@@ -94,11 +94,11 @@ def CreateNavButton(hbox, icon):
     return button
      
 def CreateButtonBar(win):
-    global configFile, buttonBar 
+    global buttonBar 
     
     buttonBar = gtk.HBox(False, 5)
     
-    if configFile:
+    if pages:
         sorted_pages = sorted(pages.iteritems(), key=operator.itemgetter(1))
         for page in sorted_pages:
             CreateButton(buttonBar, page[0])
@@ -125,26 +125,6 @@ def CreateWebBox():
     settings = web.get_settings()
     settings.set_property('enable-page-cache', True)
     return web
-
-def ParseConfig():
-    global configFile, window
-    configFilepath = os.path.join(os.path.dirname(__file__), 'config.xml')
-    try:
-        configFile = open(configFilepath)
-    except IOError:
-       configFile = None
-
-    if configFile:
-        tree = ET.parse(configFilepath)
-        root = tree.getroot()
-        for page in root.findall('page'):
-          name = page.find('name').text
-          url  = page.find('url').text
-          img  = page.find('img').text
-          order= page.find('order').text
-          pages[name] = [order, url, img]
-    else:
-        PreferencesWindow()
         
 def GetFirst(iterable, default=None):
     if iterable:
@@ -162,15 +142,14 @@ window.set_title('Usenet Dashboard')
 window.connect('destroy', close_window)
 window.connect('key_press_event', on_key_press)
 
-ParseConfig()
-
+pages = dashboard_common.ParseConfig(True)
 agr = gtk.AccelGroup()
 window.add_accel_group(agr)
 hbox = CreateButtonBar(window)
 
 browser = CreateWebBox()
 
-if configFile:
+if pages:
     # even uglier, still works -- need to clean dear god
     # had to do this to ensure you get the first one, in order of insertion
     # !!! This already bit me in the ass haha

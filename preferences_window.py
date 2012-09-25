@@ -3,11 +3,11 @@ import gtk, gobject
 import operator
 import xml.etree.ElementTree as ET
 import xml.dom.minidom
+import dashboard_common
 
 class PreferencesWindow:
     pages = dict()
     page_entries = dict()
-    configFile = None
     count = 1
     entry_vbox = gtk.VBox(False, 0)
 
@@ -19,7 +19,7 @@ class PreferencesWindow:
         caller_widget.set_filename(data)
         
     def save_preferences(self, caller_widget):
-        self.WriteConfig()
+        dashboard_common.WriteConfig(self.pages)
         self.window.destroy()
         # update main window -- reload button names, imgs if applicable
         
@@ -89,11 +89,8 @@ class PreferencesWindow:
                 if int(self.pages[page][0]) > highest:
                     highest = int(self.pages[page][0])
             self.pages[new_site_name] = ['', '', '']
-            self.CreatePageEntry(str(highest+1), new_site_name, '', '')
-            
-            self.UpdateComboBoxes()
-            
-                
+            self.CreatePageEntry(str(highest+1), new_site_name, '', '')    
+            self.UpdateComboBoxes()  
             self.vbox.show_all()
         dialog.destroy()
     # End Callbacks #
@@ -134,71 +131,6 @@ class PreferencesWindow:
                     winner = name
             count = count + 1 
         return winner
-        
-    def PrettyPrint(self, elem, level=0):
-        i = "\n" + level*"  "
-        if len(elem):
-            if not elem.text or not elem.text.strip():
-                elem.text = i + "  "
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-            for elem in elem:
-                self.PrettyPrint(elem, level+1)
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-        else:
-            if level and (not elem.tail or not elem.tail.strip()):
-                elem.tail = i
-    
-    def WriteConfig(self):
-        configFilepath = os.path.join(os.path.dirname(__file__), 'config.xml')
-        try:
-            self.configFile = open(configFilepath, 'w+')
-        except IOError:
-            print "exception"
-            
-        root = ET.Element('pages')
-        for name in self.pages:
-            order = self.pages[name][0]
-            url   = self.pages[name][1]
-            img   = self.pages[name][2]
- 
-            pageNode = ET.SubElement(root, 'page')
-            
-            orderNode = ET.SubElement(pageNode, 'order')
-            orderNode.text = order
-            
-            nameNode = ET.SubElement(pageNode, 'name')
-            nameNode.text = name
-            
-            urlNode = ET.SubElement(pageNode, 'url')
-            urlNode.text = url
-            
-            imgNode = ET.SubElement(pageNode, 'img')                        
-            imgNode.text = img
-        
-        tree = ET.ElementTree(root)
-        
-        self.PrettyPrint(root)
-        
-        tree.write(configFilepath)
-              
-    def ParseConfig(self):
-        configFilepath = os.path.join(os.path.dirname(__file__), 'config.xml')
-        try:
-            self.configFile = open(configFilepath)
-        except IOError:
-           return
-
-        if self.configFile:
-            tree = ET.parse(configFilepath)
-            root = tree.getroot()
-            for page in root.findall('page'):
-              name  = page.find('name').text
-              url   = page.find('url').text
-              img   = page.find('img').text
-              order = page.find('order').text
-              self.pages[name] = [order, url, img]
         
     def CreateButton(self, text, icon):
         
@@ -330,7 +262,7 @@ class PreferencesWindow:
         
         self.vbox.pack_start(gtk.Label(''), False)
         
-        if self.configFile:
+        if self.pages:
             sorted_pages = sorted(self.pages.iteritems(), key=operator.itemgetter(1))
             for page in sorted_pages:
                 pageName = page[0]
@@ -358,7 +290,7 @@ class PreferencesWindow:
         self.vbox = gtk.VBox(False, 0)
         self.vbox.set_spacing(15)
 
-        self.ParseConfig()
+        self.pages = dashboard_common.ParseConfig()
         self.CreatePreferences()
         
         
