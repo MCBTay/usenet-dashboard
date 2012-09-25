@@ -8,6 +8,8 @@ class PreferencesWindow:
     pages = dict()
     page_entries = dict()
     configFile = None
+    count = 1
+    entry_vbox = gtk.VBox(False, 0)
 
     # Callbacks #
     def destroy_window(self, caller_widget):
@@ -25,7 +27,7 @@ class PreferencesWindow:
     # name is passed in to know which record to update in the dictionary
     def entry_changed(self, caller_widget, order = None, name = None):
         newText = caller_widget.get_text()
-        
+
         if order:
             page = self.findPageByOrder(int(order))
             # since we can't change keys, we'll have to create a new entry and delete the old one
@@ -43,7 +45,8 @@ class PreferencesWindow:
     def combobox_changed(self, caller_widget, name = None):
         # offset by one because get_active() returns the index of the active, not data
         newOrder = caller_widget.get_active() + 1 
-        self.pages[name][0] = str(newOrder)
+        if name:
+            self.pages[name][0] = str(newOrder)
         
     def filechooser_changed(self, caller_widget, name = None):
         newImg = caller_widget.get_filename()
@@ -62,8 +65,52 @@ class PreferencesWindow:
         dialog.destroy()
         
     def add_clicked(self, caller_widget):
-        print 'adding new entry'
+        #popup asking name
+        labelString = 'What would you like to call the new site?'
+        dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, labelString)
         
+        entry = gtk.Entry()
+        entry.connect("activate", self.new_dialog_response, dialog, gtk.RESPONSE_OK)
+        hbox = gtk.HBox()
+        hbox.pack_start(entry)
+        dialog.vbox.pack_end(hbox, True, True, 0)
+        dialog.show_all()
+        response = dialog.run()
+        new_site_name = ''
+        if response == gtk.RESPONSE_OK:
+            new_site_name = entry.get_text()
+        dialog.destroy()
+        
+        if new_site_name != '':
+            highest = 0
+            for page in self.pages.keys():
+                if int(self.pages[page][0]) > highest:
+                    highest = int(self.pages[page][0])
+            self.pages[new_site_name] = ['', '', '']
+            self.CreatePageEntry(str(highest+1), new_site_name, '', '')
+            self.vbox.show_all()
+            
+        #determine order
+        #create the entry
+        
+#        temp_title = 'New Site'
+#        try:
+#           temp_list = self.pages[temp_title]
+#           temp_title = temp_title + ' ' + str(self.count)
+#           self.count = self.count + 1
+#        except KeyError:
+#            pass
+#        
+#        highest = 0
+#        for page in self.pages.keys():
+#            if int(self.pages[page][0]) > highest:
+#                highest = int(self.pages[page][0])
+#        self.pages[temp_title] = ['', '', '']        
+#        self.CreatePageEntry(str(highest+1), temp_title, 'www.example.com', '.') 
+
+    def new_dialog_response(self, caller_widget, dialog, response):
+        print caller_widget.get_text()
+        dialog.destroy()
     # End Callbacks #
     
     def RemoveEntry(self, name):
@@ -110,6 +157,7 @@ class PreferencesWindow:
             order = self.pages[name][0]
             url   = self.pages[name][1]
             img   = self.pages[name][2]
+            print name + '-' + order + '-' + url + '-' + img
  
             pageNode = ET.SubElement(root, 'page')
             
@@ -230,6 +278,8 @@ class PreferencesWindow:
         vbox.pack_start(name, False)
         
     def CreateURLField(self, vbox, urlText, name):
+        if not urlText:
+            urlText = ''
         url = gtk.HBox()
         url.set_spacing(10)
         url.pack_start(gtk.Label(''), False)
@@ -269,7 +319,7 @@ class PreferencesWindow:
 
         vbox.pack_start(gtk.HSeparator(), False)
         
-        self.vbox.pack_start(vbox, False)
+        self.entry_vbox.pack_start(vbox, False)
         self.page_entries[name] = vbox
     
     def CreatePreferences(self):   
@@ -287,7 +337,8 @@ class PreferencesWindow:
                 self.CreatePageEntry(order, pageName, url, img)
         else:
             self.CreatePageEntry('1', '', '', '.')
-            
+           
+        self.vbox.pack_start(self.entry_vbox, False)
         self.CreateBottomButtons()
         
     def __init__(self):
@@ -296,7 +347,6 @@ class PreferencesWindow:
         self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_MENU)
 
         self.window.set_position(gtk.WIN_POS_CENTER)
-        #self.window.resize(500, 500)
         self.window.set_default_size(500, 100)
         self.window.resize(1, 1)
         
