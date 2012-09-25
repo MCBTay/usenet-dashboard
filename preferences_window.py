@@ -60,6 +60,10 @@ class PreferencesWindow:
                 del(self.pages[nameText])
                 self.RemoveEntry(nameText)
         dialog.destroy()
+        
+    def add_clicked(self, caller_widget):
+        print 'adding new entry'
+        
     # End Callbacks #
     
     def RemoveEntry(self, name):
@@ -144,17 +148,33 @@ class PreferencesWindow:
               order = page.find('order').text
               self.pages[name] = [order, url, img]
         
+    def CreateButton(self, text, icon):
+        
+        button = gtk.Button()
+        hbox = gtk.HBox(False, 0)
+        image = gtk.Image()
+        image.set_from_stock(icon, 4)
+        hbox.pack_start(image, False)
+        hbox.pack_start(gtk.Label(' '), False)
+        hbox.pack_start(gtk.Label(text), False)
+        button.add(hbox)
+        return button
+        
+        
     def CreateBottomButtons(self):
         hbox = gtk.HBox(False, 0)
         hbox.set_spacing(10)
-        save = gtk.Button(stock = gtk.STOCK_SAVE)
+        save = self.CreateButton('Save', gtk.STOCK_SAVE)
         save.connect('clicked', self.save_preferences)
-        cancel = gtk.Button(stock = gtk.STOCK_CANCEL)
+        cancel = self.CreateButton('Cancel', gtk.STOCK_CANCEL)
         cancel.connect('clicked', self.destroy_window)
+        add = self.CreateButton('Add New Page', gtk.STOCK_ADD)
+        add.connect('clicked', self.add_clicked)
         
         hbox.pack_start(gtk.Label(''), True, False)
         hbox.pack_start(save, False)
         hbox.pack_start(cancel, False)
+        hbox.pack_start(add, False)
         hbox.pack_start(gtk.Label(''), True, False)
 
         self.vbox.pack_start(hbox, False)
@@ -186,7 +206,7 @@ class PreferencesWindow:
     def CreateDeleteButton(self, name, nameText):
         delete = gtk.Button()
         image = gtk.Image()
-        image.set_from_stock(gtk.STOCK_CLOSE, 32)
+        image.set_from_stock(gtk.STOCK_CLOSE, 4)
         delete.set_image(image)
         name.pack_start(delete, False)
         delete.connect('clicked', self.delete_clicked, nameText)
