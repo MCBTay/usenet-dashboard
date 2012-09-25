@@ -10,167 +10,154 @@ from preferences_window import PreferencesWindow
 from about_window import AboutWindow
 import dashboard_common
 
-global menuBar, buttonBar, browser, progress
-global window
+class Dashboard:
+    pages = dict()
 
-pages = dict()
+    # Callbacks #
+    def close_window(self, caller_widget):
+        gtk.main_quit() 
+        
+    def create_preferences_window(self, caller_widget):
+        PreferencesWindow()
+        
+    def button_clicked(self, button):
+        #ugly but works
+        buttonName = button.get_child().get_children()[1].get_label()
+        url = self.pages[buttonName][1]
+        self.browser.open(url)
+        
+    def back_button_clicked(self, button):
+        self.browser.go_back()
 
-# Callbacks #
-def close_window(caller_widget):
-    gtk.main_quit() 
-    
-def create_preferences_window(caller_widget):
-    PreferencesWindow()
-    
-def button_clicked(button):
-    #ugly but works
-    buttonName = button.get_child().get_children()[1].get_label()
-    url = pages[buttonName][1]
-    global browser
-    browser.open(url)
-    
-def back_button_clicked(button):
-    global browser
-    browser.go_back()
-def forward_button_clicked(button):
-    global browser
-    browser.go_forward()
-def refresh_button_clicked(button):
-    global browser
-    browser.reload()
-    
-def download_requested(webview, download):
-    print 'trying to download', download
-    download.set_destination_uri('.')
-    download.start()
-    return True
-    
-def load_progress_changed(webview, amount):
-    global progress
-    progress.set_fraction(amount / 100.0)
-    
-def load_started(webview, frame):
-    global progress
-    progress.set_visible(True)
-    
-def load_finished(webview, frame):
-    global progress
-    progress.set_visible(False)
-    
-def create_about_window(caller_widget):
-    AboutWindow()
+    def forward_button_clicked(self, button):
+        self.browser.go_forward()
+        
+    def refresh_button_clicked(self, button):
+        self.browser.reload()
+        
+    def download_requested(self, webview, download):
+        print 'trying to download', download
+        download.set_destination_uri('.')
+        download.start()
+        return True
+        
+    def load_progress_changed(self, webview, amount):
+        self.progress.set_fraction(amount / 100.0)
+        
+    def load_started(self, webview, frame):
+        self.progress.set_visible(True)
+        
+    def load_finished(self, webview, frame):
+        self.progress.set_visible(False)
+        
+    def create_about_window(self, caller_widget):
+        AboutWindow()
 
-def on_key_press(caller_widget, event):
-    global browser
-    keyname = gtk.gdk.keyval_name(event.keyval)
-    if keyname == 'F5':
-        browser.reload()
+    def on_key_press(self, caller_widget, event):
+        keyname = gtk.gdk.keyval_name(event.keyval)
+        if keyname == 'F5':
+            self.browser.reload()
+    # End Callbacks #
+        
+    def CreateButton(self, hbox, name):
+        box = gtk.HBox(False, 0)
+        
+        image = gtk.Image()
+        image.set_from_file(self.pages[name][2])
+        
+        label = gtk.Label(name)  
 
-# End Callbacks #
-    
-def CreateButton(hbox, name):
-    box = gtk.HBox(False, 0)
-    
-    image = gtk.Image()
-    image.set_from_file(pages[name][2])
-    
-    label = gtk.Label(name)  
+        box.pack_start(image, False)
+        box.pack_start(label, False)
+        
+        button = gtk.Button()
+        button.add(box)
+        button.connect('clicked', self.button_clicked)
+        
+        hbox.pack_start(button, False)
+        
+    def CreateNavButton(self, hbox, icon):
+        image = gtk.Image()
+        image.set_from_stock(icon, 3)
+        button = gtk.Button()
+        button.add(image)
+        hbox.pack_start(button, False)
+        return button
+         
+    def CreateButtonBar(self, win):
+        
+        self.button_bar = gtk.HBox(False, 5)
+        
+        if self.pages:
+            sorted_pages = sorted(self.pages.iteritems(), key=operator.itemgetter(1))
+            for page in sorted_pages:
+                self.CreateButton(self.button_bar, page[0])
+        
+        self.button_bar.pack_start(gtk.Label(''), True, False)
+        
+        about = self.CreateNavButton(self.button_bar, gtk.STOCK_ABOUT)
+        about.connect('clicked', self.create_about_window)
+        
+        settings = self.CreateNavButton(self.button_bar, gtk.STOCK_PREFERENCES)
+        settings.connect('clicked', self.create_preferences_window)
 
-    box.pack_start(image, False)
-    box.pack_start(label, False)
-    
-    button = gtk.Button()
-    button.add(box)
-    button.connect('clicked', button_clicked)
-    
-    hbox.pack_start(button, False)
-    
-def CreateNavButton(hbox, icon):
-    image = gtk.Image()
-    image.set_from_stock(icon, 3)
-    button = gtk.Button()
-    button.add(image)
-    hbox.pack_start(button, False)
-    return button
+        back    = self.CreateNavButton(self.button_bar, gtk.STOCK_GO_BACK)
+        back.connect('clicked', self.back_button_clicked)
+        forward = self.CreateNavButton(self.button_bar, gtk.STOCK_GO_FORWARD)
+        forward.connect('clicked', self.forward_button_clicked)
+        refresh = self.CreateNavButton(self.button_bar, gtk.STOCK_REFRESH)
+        refresh.connect('clicked', self.refresh_button_clicked)    
+        return self.button_bar
      
-def CreateButtonBar(win):
-    global buttonBar 
+    def CreateWebBox(self):
+        web = webkit.WebView()
+        settings = web.get_settings()
+        settings.set_property('enable-page-cache', True)
+        return web
     
-    buttonBar = gtk.HBox(False, 5)
-    
-    if pages:
-        sorted_pages = sorted(pages.iteritems(), key=operator.itemgetter(1))
-        for page in sorted_pages:
-            CreateButton(buttonBar, page[0])
-    
-    buttonBar.pack_start(gtk.Label(''), True, False)
-    
-    about = CreateNavButton(buttonBar, gtk.STOCK_ABOUT)
-    about.connect('clicked', create_about_window)
-    
-    settings = CreateNavButton(buttonBar, gtk.STOCK_PREFERENCES)
-    settings.connect('clicked', create_preferences_window)
+    def __init__(self):
+        window = gtk.Window()
+        iconFilepath = os.path.join(os.path.dirname(__file__), 'img/icon.svg')
+        window.set_icon_from_file(iconFilepath);
+        window.set_position(gtk.WIN_POS_CENTER)
+        window.resize(1024, 768)
+        window.set_title('Usenet Dashboard')
+        window.connect('destroy', self.close_window)
+        window.connect('key_press_event', self.on_key_press)
 
-    back    = CreateNavButton(buttonBar, gtk.STOCK_GO_BACK)
-    back.connect('clicked', back_button_clicked)
-    forward = CreateNavButton(buttonBar, gtk.STOCK_GO_FORWARD)
-    forward.connect('clicked', forward_button_clicked)
-    refresh = CreateNavButton(buttonBar, gtk.STOCK_REFRESH)
-    refresh.connect('clicked', refresh_button_clicked)    
-    return buttonBar
+        self.pages = dashboard_common.ParseConfig(True)
+        agr = gtk.AccelGroup()
+        window.add_accel_group(agr)
+        hbox = self.CreateButtonBar(window)
 
-    
-def CreateWebBox():
-    web = webkit.WebView()
-    settings = web.get_settings()
-    settings.set_property('enable-page-cache', True)
-    return web
-        
-def GetFirst(iterable, default=None):
-    if iterable:
-        for item in iterable:
-            return item
-    return default
-        
+        self.browser = self.CreateWebBox()
+
+        if self.pages:
+            # even uglier, still works -- need to clean dear god
+            # had to do this to ensure you get the first one, in order of insertion
+            # !!! This already bit me in the ass haha -- and again
+            print self.button_bar.get_children()
+            buttonName = self.button_bar.get_children()[0].get_children()[0].get_children()[1].get_label()
+            url = self.pages[buttonName][1]
+            self.browser.open(url)
             
-window = gtk.Window()
-iconFilepath = os.path.join(os.path.dirname(__file__), 'img/icon.svg')
-window.set_icon_from_file(iconFilepath);
-window.set_position(gtk.WIN_POS_CENTER)
-window.resize(1024, 768)
-window.set_title('Usenet Dashboard')
-window.connect('destroy', close_window)
-window.connect('key_press_event', on_key_press)
+        self.browser.connect('load-started', self.load_started)
+        self.browser.connect('load-progress-changed', self.load_progress_changed)
+        self.browser.connect('load-finished', self.load_finished)
+        self.browser.connect('download-requested', self.download_requested)
 
-pages = dashboard_common.ParseConfig(True)
-agr = gtk.AccelGroup()
-window.add_accel_group(agr)
-hbox = CreateButtonBar(window)
+        scroller = gtk.ScrolledWindow()
+        scroller.add(self.browser)
 
-browser = CreateWebBox()
+        self.progress = gtk.ProgressBar()
 
-if pages:
-    # even uglier, still works -- need to clean dear god
-    # had to do this to ensure you get the first one, in order of insertion
-    # !!! This already bit me in the ass haha
-    buttonName = buttonBar.get_children()[0].get_children()[0].get_children()[1].get_label()
-    url = pages[buttonName][1]
-    browser.open(url)
-    
-browser.connect('load-started', load_started)
-browser.connect('load-progress-changed', load_progress_changed)
-browser.connect('load-finished', load_finished)
-browser.connect('download-requested', download_requested)
+        vbox = gtk.VBox(False, 2)
+        vbox.pack_start(hbox, False, False, 0)
+        vbox.pack_start(scroller)
+        vbox.pack_start(self.progress, False)
+        window.add(vbox)
+        window.show_all()        
 
-scroller = gtk.ScrolledWindow()
-scroller.add(browser)
 
-progress = gtk.ProgressBar()
-
-vbox = gtk.VBox(False, 2)
-vbox.pack_start(hbox, False, False, 0)
-vbox.pack_start(scroller)
-vbox.pack_start(progress, False)
-window.add(vbox)
-window.show_all()
+Dashboard()
 gtk.main()

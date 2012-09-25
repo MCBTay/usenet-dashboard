@@ -132,8 +132,7 @@ class PreferencesWindow:
             count = count + 1 
         return winner
         
-    def CreateButton(self, text, icon):
-        
+    def CreateButton(self, text, icon):     
         button = gtk.Button()
         hbox = gtk.HBox(False, 0)
         image = gtk.Image()
@@ -143,8 +142,7 @@ class PreferencesWindow:
         hbox.pack_start(gtk.Label(text), False)
         button.add(hbox)
         return button
-        
-        
+             
     def CreateBottomButtons(self):
         hbox = gtk.HBox(False, 0)
         hbox.set_spacing(10)
