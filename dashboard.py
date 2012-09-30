@@ -36,7 +36,9 @@ class Dashboard:
         
     def download_requested(self, webview, download):
         print 'trying to download', download
-        download.set_destination_uri('.')
+        print 'size: ', download.get_total_size()
+        print 'suggested filename: ', download.get_suggested_filename()
+        download.set_destination_uri('file:///home/mcbtay/Downloads/_NZBs/' + download.get_suggested_filename())
         download.start()
         return True
         
