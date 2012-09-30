@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
-import os, sys, inspect
+import os, sys
 import gtk
+import ctypes
 import webkit
-import string
 import operator
-import xml.etree.ElementTree as ET
 from preferences_window import PreferencesWindow
 from about_window import AboutWindow
 import dashboard_common
@@ -113,12 +112,23 @@ class Dashboard:
         web = webkit.WebView()
         settings = web.get_settings()
         settings.set_property('enable-page-cache', True)
+        settings.set_property('enable-java-applet', True)
+        settings.set_property('enable-scripts', True)
         return web
     
     def __init__(self):
+        libsoup = ctypes.CDLL('/usr/lib/x86_64-linux-gnu/libsoup-2.4.so.1')
+        libwebkit = ctypes.CDLL('/usr/lib/libwebkitgtk-1.0.so.0')
+        
         window = gtk.Window()
-        iconFilepath = os.path.join(os.path.dirname(__file__), 'img/icon.svg')
-        window.set_icon_from_file(iconFilepath);
+        
+        session = libwebkit.webkit_get_default_session()
+        cookie_filepath = os.path.join(os.path.dirname(__file__), 'cookies.txt')
+        cookiejar = libsoup.soup_cookie_jar_text_new(cookie_filepath, False)
+        libsoup.soup_session_add_feature(session, cookiejar)
+          
+        icon_filepath = os.path.join(os.path.dirname(__file__), 'img/icon.svg')
+        window.set_icon_from_file(icon_filepath);
         window.set_position(gtk.WIN_POS_CENTER)
         window.resize(1024, 768)
         window.set_title('Usenet Dashboard')
