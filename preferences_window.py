@@ -6,10 +6,11 @@ import xml.dom.minidom
 import dashboard_common
 
 class PreferencesWindow:
-    pages = dict()
+    configuration = dict()
     page_entries = dict()
     count = 1
     entry_vbox = gtk.VBox(False, 0)
+    entry_vbox.set_spacing(10)
 
     # Callbacks #
     def destroy_window(self, caller_widget):
@@ -19,7 +20,7 @@ class PreferencesWindow:
         caller_widget.set_filename(data)
         
     def save_preferences(self, caller_widget):
-        dashboard_common.WriteConfig(self.pages)
+        dashboard_common.WriteConfig(self.configuration['pages'])
         self.window.destroy()
         # update main window -- reload button names, imgs if applicable
         
@@ -31,26 +32,26 @@ class PreferencesWindow:
         if order:
             page = self.findPageByOrder(int(order))
             # since we can't change keys, we'll have to create a new entry and delete the old one
-            storedOrder = self.pages[page][0]
-            storedUrl   = self.pages[page][1]
-            storedImg   = self.pages[page][2]
-            self.pages[newText] = [storedOrder, storedUrl, storedImg]
-            for tempField in self.pages.keys():
+            storedOrder = self.configuration['pages'][page][0]
+            storedUrl   = self.configuration['pages'][page][1]
+            storedImg   = self.configuration['pages'][page][2]
+            self.configuration['pages'][newText] = [storedOrder, storedUrl, storedImg]
+            for tempField in self.configuration['pages'].keys():
                 if tempField == page:
-                    del(self.pages[tempField])
+                    del(self.configuration['pages'][tempField])
         else: 
             # so far URL is the only other case, so i'm handling it specifically
-            self.pages[name][1] = newText
+            self.configuration['pages'][name][1] = newText
             
     def combobox_changed(self, caller_widget, name = None):
         # offset by one because get_active() returns the index of the active, not data
         newOrder = caller_widget.get_active() + 1 
         if name:
-            self.pages[name][0] = str(newOrder)
+            self.configuration['pages'][name][0] = str(newOrder)
         
     def filechooser_changed(self, caller_widget, name = None):
         newImg = caller_widget.get_filename()
-        self.pages[name][2] = newImg    
+        self.configuration['pages'][name][2] = newImg    
         
     def delete_clicked(self, caller_widget, nameText):
         labelString = 'Are you sure you want to delete your entry for ' + nameText + '?'
@@ -59,8 +60,8 @@ class PreferencesWindow:
         dialog.vbox.pack_start(gtk.Label(labelString))
         dialog.show_all()
         if (dialog.run() == gtk.RESPONSE_ACCEPT):
-            if (self.pages[nameText]):
-                del(self.pages[nameText])
+            if (self.configuration['pages'][nameText]):
+                del(self.configuration['pages'][nameText])
                 self.RemoveEntry(nameText)
         dialog.destroy()
         
@@ -85,10 +86,10 @@ class PreferencesWindow:
         new_site_name = caller_widget.get_text()
         if new_site_name != '':
             highest = 0
-            for page in self.pages.keys():
-                if int(self.pages[page][0]) > highest:
-                    highest = int(self.pages[page][0])
-            self.pages[new_site_name] = ['', '', '']
+            for page in self.configuration['pages'].keys():
+                if int(self.configuration['pages'][page][0]) > highest:
+                    highest = int(self.configuration['pages'][page][0])
+            self.configuration['pages'][new_site_name] = ['', '', '']
             self.CreatePageEntry(str(highest+1), new_site_name, '', '')    
             self.UpdateComboBoxes()  
             self.vbox.show_all()
@@ -119,14 +120,14 @@ class PreferencesWindow:
         if (self.page_entries[name]):
             self.entry_vbox.remove(self.page_entries[name])
         self.vbox.show_all()
-        self.window.resize(1, 1)
+        #self.window.resize(1, 1)
     
     def findPageByOrder(self, order):
         winner = None
         count = 1
-        while count <= len(self.pages):
-            for name in self.pages:
-                pageOrder = self.pages[name][0]
+        while count <= len(self.configuration['pages']):
+            for name in self.configuration['pages']:
+                pageOrder = self.configuration['pages'][name][0]
                 if int(pageOrder) == order:
                     winner = name
             count = count + 1 
@@ -172,11 +173,11 @@ class PreferencesWindow:
         orderDropdown.add_attribute(cell, 'text', 0)
         orderDropdown.connect('changed', self.combobox_changed, name)
         
-        if len(self.pages) == 0:
+        if len(self.configuration['pages']) == 0:
             liststore.append([str(1)])
         else:
             count = 1
-            while count <= len(self.pages):
+            while count <= len(self.configuration['pages']):
                 liststore.append([str(count)])
                 count = count + 1
          
@@ -255,42 +256,119 @@ class PreferencesWindow:
         
         self.entry_vbox.pack_start(vbox, False)
         self.page_entries[name] = vbox
-    
-    def CreatePreferences(self):   
-        
-        self.vbox.pack_start(gtk.Label(''), False)
-        
-        if self.pages:
-            sorted_pages = sorted(self.pages.iteritems(), key=operator.itemgetter(1))
+           
+    def CreateSiteConfigurationTab(self, notebook):
+        sites_config = gtk.Frame('Website Configuration')   
+        notebook.append_page(sites_config, gtk.Label('Sites'))
+        self.entry_vbox.pack_start(gtk.Label(''), False)
+        if self.configuration['pages']:
+            sorted_pages = sorted(self.configuration['pages'].iteritems(), key=operator.itemgetter(1))
             for page in sorted_pages:
                 pageName = page[0]
-  
-                order = self.pages[pageName][0]
-                url   = self.pages[pageName][1]
-                img   = self.pages[pageName][2]
+                order = self.configuration['pages'][pageName][0]
+                url   = self.configuration['pages'][pageName][1]
+                img   = self.configuration['pages'][pageName][2]
                 self.CreatePageEntry(order, pageName, url, img)
         else:
             self.CreatePageEntry('1', '', '', '.')
-           
-        self.vbox.pack_start(self.entry_vbox, False)
-        self.CreateBottomButtons()
+            
+        scrolled_window = gtk.ScrolledWindow()
+        scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        viewport = gtk.Viewport();
+        viewport.add(self.entry_vbox)
+        scrolled_window.add(viewport)
+        sites_config.add(scrolled_window)
+    
+    def CreateGeneralOptionsTab(self, notebook):
+        options = gtk.Frame('General Options')
+        notebook.append_page(options, gtk.Label('General'))
         
+        vbox = gtk.VBox()
+        vbox.set_spacing(10)
+        vbox.pack_start(gtk.Label(''), False)
+        self.CreateDownloadsPathEntry(vbox, options)
+        self.CreateLibsoupPathEntry(vbox, options)
+        self.CreateLibwebkitPathEntry(vbox, options)
+        options.add(vbox)
+        
+    def CreateDownloadsPathEntry(self, vbox, options):
+        img = gtk.HBox()
+        img.set_spacing(15)
+        img.pack_start(gtk.Label(''), False)
+        imgLabel = gtk.Label('Downloads Path')
+        imgLabel.set_width_chars(13)
+        imgChooser = gtk.FileChooserButton('Downloads Path')
+        imgChooser.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
+        
+        saved_path = self.configuration['settings']['downloadPath']
+        if saved_path:
+            imgChooser.connect('file-activated', self.file_selected, saved_path)
+            
+        imgChooser.emit('file-activated')
+        #imgChooser.connect('file-set', self.filechooser_changed, name)
+        img.pack_start(imgLabel, False)
+        img.pack_start(imgChooser)
+        img.pack_start(gtk.Label(''), False)
+        vbox.pack_start(img, False)
+        
+    def CreateLibsoupPathEntry(self, vbox, options):
+        img = gtk.HBox()
+        img.set_spacing(15)
+        img.pack_start(gtk.Label(''), False)
+        imgLabel = gtk.Label('libsoup Path')
+        imgLabel.set_width_chars(13)
+        imgChooser = gtk.FileChooserButton('libsoup Path')
+        
+        saved_path = self.configuration['settings']['libsoupPath']
+        if saved_path:
+            imgChooser.connect('file-activated', self.file_selected, saved_path)
+            
+        imgChooser.emit('file-activated')
+        #imgChooser.connect('file-set', self.filechooser_changed, name)
+        img.pack_start(imgLabel, False)
+        img.pack_start(imgChooser)
+        img.pack_start(gtk.Label(''), False)
+        vbox.pack_start(img, False)
+    
+    def CreateLibwebkitPathEntry(self, vbox, options):
+        img = gtk.HBox()
+        img.set_spacing(15)
+        img.pack_start(gtk.Label(''), False)
+        imgLabel = gtk.Label('libwebkit Path')
+        imgLabel.set_width_chars(13)
+        imgChooser = gtk.FileChooserButton('libwebkit Path')
+        
+        saved_path = self.configuration['settings']['libwebkitPath']
+        if saved_path:
+            imgChooser.connect('file-activated', self.file_selected, saved_path)
+        
+        imgChooser.emit('file-activated')
+        #imgChooser.connect('file-set', self.filechooser_changed, name)
+        img.pack_start(imgLabel, False)
+        img.pack_start(imgChooser)
+        img.pack_start(gtk.Label(''), False)
+        vbox.pack_start(img, False)
+        
+    def CreatePreferences(self):             
+        notebook = gtk.Notebook()
+        self.CreateGeneralOptionsTab(notebook)
+        self.CreateSiteConfigurationTab(notebook)  
+        
+        self.window.add(notebook)
+          
     def __init__(self):
         self.window = gtk.Window()
         self.window.set_title('Preferences')
         self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_MENU)
-
+        self.window.set_size_request(400, 600)
+        self.window.set_resizable(False)
+        
         self.window.set_position(gtk.WIN_POS_CENTER)
-        self.window.set_default_size(500, 100)
-        self.window.resize(1, 1)
         
         self.window.connect('destroy', self.destroy_window)
         self.vbox = gtk.VBox(False, 0)
         self.vbox.set_spacing(15)
-
-        self.pages = dashboard_common.ParseConfig()
+        self.configuration = dashboard_common.ParseConfig()
         self.CreatePreferences()
         
-        
-        self.window.add(self.vbox)
         self.window.show_all()
