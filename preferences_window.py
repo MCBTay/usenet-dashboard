@@ -1,5 +1,5 @@
 import os
-import gtk, gobject
+import gtk, gobject, glib
 import operator
 import xml.etree.ElementTree as ET
 import xml.dom.minidom
@@ -94,6 +94,20 @@ class PreferencesWindow:
             self.UpdateComboBoxes()  
             self.vbox.show_all()
         dialog.destroy()
+        
+    def update_button_thumbnail(self, button, filename):
+        image = gtk.Image()
+        image.set_from_file(filename)
+        button.set_image(image)
+        button.show_all()
+        
+    def create_file_chooser_dialog(self, button):
+        chooser = gtk.FileChooserDialog(title=None, action=gtk.FILE_CHOOSER_ACTION_OPEN, buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OK,gtk.RESPONSE_OK))
+        self.CreateChooserFilter(chooser)
+        response = chooser.run()
+        if response == gtk.RESPONSE_OK:
+            self.update_button_thumbnail(button, chooser.get_filename())
+        chooser.destroy()
     # End Callbacks #
     
     def UpdateComboBoxes(self):
@@ -228,38 +242,53 @@ class PreferencesWindow:
         url.pack_start(gtk.Label(''), False)
         vbox.pack_start(url, False)
     
-    def CreateImagePicker(self, vbox, path, name):
-        img = gtk.HBox()
-        img.set_spacing(10)
-        img.pack_start(gtk.Label(''), False)
-        imgLabel = gtk.Label('Image')
-        imgLabel.set_width_chars(5)
-        imgChooser = gtk.FileChooserButton('Image')
-        imgChooser.set_current_folder(".")
-        imgChooser.connect('file-activated', self.file_selected, path)
-        imgChooser.emit('file-activated')
-        imgChooser.connect('file-set', self.filechooser_changed, name)
-        img.pack_start(imgLabel, False)
-        img.pack_start(imgChooser)
-        img.pack_start(gtk.Label(''), False)
-        vbox.pack_start(img, False)
+    def CreateChooserFilter(self, file_chooser):
+        filter = gtk.FileFilter()
+        filter.set_name('Images')
+        filter.add_mime_type('image/png')
+        filter.add_mime_type('image/jpeg')
+        filter.add_mime_type('image/gif')
+        filter.add_pattern('*.png')
+        filter.add_pattern('*.svg')
+        filter.add_pattern('*.jpg')
+        filter.add_pattern('*.gif')
+        file_chooser.add_filter(filter)
+        
+    def CreateImagePicker(self, hbox, name):
+        button = gtk.Button()
+        
+        image = gtk.Image()
+        imagepath = self.configuration['pages'][name][2]
+        if imagepath != '' or imagepath != None:
+            image.set_from_file(imagepath)
+        else:
+            image.set_from_stock(gtk.STOCK_ADD, 5)
+        button.set_image(image)
+        button.set_size_request(60, 60)
+        button.connect('clicked', self.create_file_chooser_dialog)
+        hbox.pack_start(gtk.Label(''))
+        hbox.pack_start(button, False, False)
            
     def CreatePageEntry(self, order, name, url, img):
+        hbox = gtk.HBox()
+        self.CreateImagePicker(hbox, name)
         vbox = gtk.VBox()
         vbox.set_spacing(10)
         
         self.CreateNameField(vbox, name, order)
-        self.CreateURLField(vbox, url, name)
-        self.CreateImagePicker(vbox, img, name)        
+        self.CreateURLField(vbox, url, name)  
 
-        vbox.pack_start(gtk.HSeparator(), False)
+        hbox.pack_start(vbox, False, False)
         
-        self.entry_vbox.pack_start(vbox, False)
+        self.entry_vbox.pack_start(hbox, False, False)
+        self.entry_vbox.pack_start(gtk.HSeparator(), False)
         self.page_entries[name] = vbox
            
     def CreateSiteConfigurationTab(self, notebook):
-        sites_config = gtk.Frame('Website Configuration')   
-        notebook.append_page(sites_config, gtk.Label('Sites'))
+        sites_config = gtk.Frame()
+        sites_config.set_shadow_type(gtk.SHADOW_NONE)
+        notebook.append_page(sites_config, gtk.Label('Website Configuration'))
+        
         self.entry_vbox.pack_start(gtk.Label(''), False)
         if self.configuration['pages']:
             sorted_pages = sorted(self.configuration['pages'].iteritems(), key=operator.itemgetter(1))
@@ -273,15 +302,19 @@ class PreferencesWindow:
             self.CreatePageEntry('1', '', '', '.')
             
         scrolled_window = gtk.ScrolledWindow()
+        scrolled_window.set_shadow_type(gtk.SHADOW_NONE)
         scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        viewport = gtk.Viewport();
+        viewport = gtk.Viewport()
+        viewport.set_shadow_type(gtk.SHADOW_NONE)
         viewport.add(self.entry_vbox)
         scrolled_window.add(viewport)
         sites_config.add(scrolled_window)
+        sites_config.add(gtk.Label('Test Label'))
     
     def CreateGeneralOptionsTab(self, notebook):
-        options = gtk.Frame('General Options')
-        notebook.append_page(options, gtk.Label('General'))
+        options = gtk.Frame()
+        options.set_shadow_type(gtk.SHADOW_NONE)
+        notebook.append_page(options, gtk.Label('General Options'))
         
         vbox = gtk.VBox()
         vbox.set_spacing(10)
@@ -360,7 +393,7 @@ class PreferencesWindow:
         self.window = gtk.Window()
         self.window.set_title('Preferences')
         self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_MENU)
-        self.window.set_size_request(400, 600)
+        self.window.set_size_request(450, 600)
         self.window.set_resizable(False)
         
         self.window.set_position(gtk.WIN_POS_CENTER)
