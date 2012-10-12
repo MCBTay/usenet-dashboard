@@ -22,7 +22,7 @@ class Dashboard:
     def button_clicked(self, button):
         #ugly but works
         buttonName = button.get_child().get_children()[1].get_label()
-        url = self.pages[buttonName][1]
+        url = self.configuration['pages'][buttonName][1]
         self.browser.open(url)
         
     def back_button_clicked(self, button):
@@ -35,10 +35,14 @@ class Dashboard:
         self.browser.reload()
         
     def download_requested(self, webview, download):
-        print 'trying to download', download
-        print 'size: ', download.get_total_size()
-        print 'suggested filename: ', download.get_suggested_filename()
-        download.set_destination_uri('file:///home/mcbtay/Downloads/_NZBs/' + download.get_suggested_filename())
+        downloadPath = '/home/mcbtay/Downloads/_NZBs'
+
+        if downloadPath[-1:] != '/':
+            downloadPath = downloadPath + '/'
+        
+        # potential future feature to save as? 
+        # need to somehow indicate that the file is downloading / has been downloaded
+        download.set_destination_uri('file:///' + downloadPath + download.get_suggested_filename())
         download.start()
         return True
         
@@ -64,7 +68,7 @@ class Dashboard:
         box = gtk.HBox(False, 0)
         
         image = gtk.Image()
-        image.set_from_file(self.pages[name][2])
+        image.set_from_file(self.configuration['pages'][name][2])
         
         label = gtk.Label(name)  
 
@@ -85,12 +89,11 @@ class Dashboard:
         hbox.pack_start(button, False)
         return button
          
-    def CreateButtonBar(self, win):
-        
+    def CreateButtonBar(self, win):   
         self.button_bar = gtk.HBox(False, 5)
         
-        if self.pages:
-            sorted_pages = sorted(self.pages.iteritems(), key=operator.itemgetter(1))
+        if self.configuration['pages']:
+            sorted_pages = sorted(self.configuration['pages'].iteritems(), key=operator.itemgetter(1))
             for page in sorted_pages:
                 self.CreateButton(self.button_bar, page[0])
         
@@ -119,8 +122,15 @@ class Dashboard:
         return web
     
     def __init__(self):
-        libsoup = ctypes.CDLL('/usr/lib/x86_64-linux-gnu/libsoup-2.4.so.1')
-        libwebkit = ctypes.CDLL('/usr/lib/libwebkitgtk-1.0.so.0')
+        self.configuration = dashboard_common.ParseConfig(True)
+        
+        libsoup_path = self.configuration['settings']['libsoupPath']
+        if libsoup_path:
+            libsoup = ctypes.CDLL(libsoup_path)
+            
+        libwebkit_path = self.configuration['settings']['libwebkitPath']
+        if libwebkit_path:
+            libwebkit = ctypes.CDLL(libwebkit_path)
         
         window = gtk.Window()
         
@@ -129,7 +139,7 @@ class Dashboard:
         cookiejar = libsoup.soup_cookie_jar_text_new(cookie_filepath, False)
         libsoup.soup_session_add_feature(session, cookiejar)
           
-        icon_filepath = os.path.join(os.path.dirname(__file__), 'img/icon.svg')
+        icon_filepath = os.path.join(os.path.dirname(__file__), 'img/logo.png')
         window.set_icon_from_file(icon_filepath);
         window.set_position(gtk.WIN_POS_CENTER)
         window.resize(1024, 768)
@@ -137,20 +147,19 @@ class Dashboard:
         window.connect('destroy', self.close_window)
         window.connect('key_press_event', self.on_key_press)
 
-        self.pages = dashboard_common.ParseConfig(True)
+        
         agr = gtk.AccelGroup()
         window.add_accel_group(agr)
         hbox = self.CreateButtonBar(window)
 
         self.browser = self.CreateWebBox()
-
-        if self.pages:
+        
+        if self.configuration['pages']:
             # even uglier, still works -- need to clean dear god
             # had to do this to ensure you get the first one, in order of insertion
             # !!! This already bit me in the ass haha -- and again
-            print self.button_bar.get_children()
             buttonName = self.button_bar.get_children()[0].get_children()[0].get_children()[1].get_label()
-            url = self.pages[buttonName][1]
+            url = self.configuration['pages'][buttonName][1]
             self.browser.open(url)
             
         self.browser.connect('load-started', self.load_started)

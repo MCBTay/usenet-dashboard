@@ -17,7 +17,7 @@ class AboutWindow:
 
     def CreateIcon(self):
         icon = gtk.Image()
-        icon_filepath = os.path.join(os.path.dirname(__file__), 'img/icon.svg')
+        icon_filepath = os.path.join(os.path.dirname(__file__), 'img/logo.png')
         icon.set_from_file(icon_filepath)
         self.vbox.pack_start(icon)
         

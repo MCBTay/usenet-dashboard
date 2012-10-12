@@ -5,23 +5,31 @@ import preferences_window
 config_filepath = os.path.join(os.path.dirname(__file__), 'config.xml')
 
 def ParseConfig(trigger_preferences=False):
-    pages = dict()
-    
     try:
         config_file = open(config_filepath)
     except IOError:
         config_file = None
 
     if config_file:
+        configuration = dict()
         tree = ET.parse(config_filepath)
         root = tree.getroot()
-        for page in root.findall('page'):
-            name = page.find('name').text
-            url = page.find('url').text
-            img = page.find('img').text
-            order = page.find('order').text
-            pages[name] = [order, url, img]
-        return pages
+        for child in root:
+            if child.tag == 'settings':
+                settings = dict()
+                for setting in child:
+                    settings[setting.tag] = setting.text
+                configuration['settings'] = settings
+            if child.tag == 'pages':
+                pages = dict()
+                for page in child.findall('page'):
+                    name = page.find('name').text
+                    url = page.find('url').text
+                    img = page.find('img').text
+                    order = page.find('order').text
+                    pages[name] = [order, url, img]
+                configuration['pages'] = pages
+        return configuration            
     else:
         if trigger_preferences:
             preferences_window.PreferencesWindow()
