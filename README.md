@@ -1,19 +1,21 @@
 ================
 usenet-dashboard
 ================
-A dashboard for managing all usenet-related windows in one easy spot.
+A dashboard for managing all usenet-related windows in one easy spot.  Now with cookie support and the ability to download files!
 
 ================
 Dependencies
 ================
-python, python-webkit
+1. python
+2. python-webkit
+3. libsoup & libwebkitgtk (for cookie support)
 
 ================
 Usage
 ================
 1. 'sudo chmod +x dashboard.py'
 2. './dashboard.py'
-3. Add desired tabs by going to File > Preferences.
+3. Add desired sites by going to File > Preferences.
 
 =================
 Licensing
