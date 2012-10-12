@@ -1,8 +1,15 @@
-<pages>
-  <page>
-    <order>1</order>
-    <name>SABnzbd+</name>
-    <url>http://localhost:8080/sabnzbd/</url>
-    <img />
-  </page>
-</pages>
+<configuration>
+    <settings>
+        <downloadPath>/path/to/download/folder/</downloadPath>
+        <libsoupPath>/usr/lib/x86_64-linux-gnu/libsoup-2.4.so.1</libsoupPath>
+        <libwebkitPath>/usr/lib/libwebkitgtk-1.0.so.0</libwebkitPath>
+    </settings>
+    <pages>
+      <page>
+        <order>1</order>
+        <name>Sick Beard</name>
+        <url>http://localhost:8081/home/</url>
+        <img/>
+      </page
+    </pages>
+</configuration>
