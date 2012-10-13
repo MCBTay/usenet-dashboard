@@ -168,6 +168,7 @@ class PreferencesWindow:
         
         self.CreateGeneralOptionSelector(vbox, 'Downloads Path', 'downloadPath', True) 
         self.CreateGeneralOptionSelector(vbox, 'libsoup Path', 'libsoupPath') 
+        self.CreateGeneralOptionSelector(vbox, 'libwebkit Path', 'libwebkitPath') 
         options.add(vbox)
         
     def CreateGeneralOptionSelector(self, vbox, labelText, varName, folderSelect = False):
