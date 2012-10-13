@@ -21,7 +21,7 @@ class PreferencesWindow:
         caller_widget.set_filename(data)
         
     def save_preferences(self, caller_widget):
-        dashboard_common.WriteConfig(self.configuration['pages'])
+        dashboard_common.WriteConfig(self.configuration)
         self.window.destroy()
         # update main window -- reload button names, imgs if applicable
         
@@ -71,7 +71,6 @@ class PreferencesWindow:
         for entry in self.page_entries:
             hbox = self.page_entries[entry].get_children()[0]
             namerow = hbox.get_children()[1].get_children()[0]
-            print namerow.get_children()[0].get_children()
             if type(entry) == gtk.ComboBox:
                 comboboxes.append(child)       
            # break # combo box is always in first row of entry

@@ -34,28 +34,37 @@ def ParseConfig(trigger_preferences=False):
         if trigger_preferences:
             preferences_window.PreferencesWindow()
             
-def WriteConfig(pages):
+def WriteConfig(configuration):
     open(config_filepath, 'w+')
+    
+    root = ET.Element('configuration')
+    
+    for child in configuration:
+        child_node = ET.SubElement(root, child)
+        if child == 'settings':
+            for setting in configuration[child]:
+                node = ET.SubElement(child_node, setting)
+                node.text = configuration[child][setting]
         
-    root = ET.Element('pages')
-    for name in pages:
-        order = pages[name][0]
-        url   = pages[name][1]
-        img   = pages[name][2]
+        if child == 'pages':   
+            for name in configuration[child]:
+                order = configuration[child][name][0]
+                url   = configuration[child][name][1]
+                img   = configuration[child][name][2]
 
-        page_node = ET.SubElement(root, 'page')
-        
-        order_node = ET.SubElement(page_node, 'order')
-        order_node.text = order
-        
-        name_node = ET.SubElement(page_node, 'name')
-        name_node.text = name
-        
-        url_node = ET.SubElement(page_node, 'url')
-        url_node.text = url
-        
-        img_node = ET.SubElement(page_node, 'img')                        
-        img_node.text = img
+                page_node = ET.SubElement(child_node, 'page')
+                
+                order_node = ET.SubElement(page_node, 'order')
+                order_node.text = order
+                
+                name_node = ET.SubElement(page_node, 'name')
+                name_node.text = name
+                
+                url_node = ET.SubElement(page_node, 'url')
+                url_node.text = url
+                
+                img_node = ET.SubElement(page_node, 'img')                        
+                img_node.text = img
     
     tree = ET.ElementTree(root)
     PrettyPrint(root)
