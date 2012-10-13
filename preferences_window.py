@@ -24,11 +24,7 @@ class PreferencesWindow:
         dashboard_common.WriteConfig(self.configuration)
         self.window.destroy()
         # update main window -- reload button names, imgs if applicable
-        
-
-            
-
-        
+         
     def add_clicked(self, caller_widget):
         labelString = 'What would you like to call the new site?'
         dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, labelString)
@@ -59,9 +55,13 @@ class PreferencesWindow:
             self.vbox.show_all()
         dialog.destroy()
         
-
+    def filechooser_folder_changed(self, caller_widget, name):
+        new_selection = caller_widget.get_filename()
+        self.configuration['settings'][name] = new_selection  
         
-
+    def filechooser_changed(self, caller_widget, name):
+        new_selection = caller_widget.get_filename()
+        self.configuration['settings'][name] = new_selection  
     # End Callbacks #
     
     
@@ -171,24 +171,24 @@ class PreferencesWindow:
         options.add(vbox)
         
     def CreateDownloadsPathEntry(self, vbox, options):
-        img = gtk.HBox()
-        img.set_spacing(15)
-        img.pack_start(gtk.Label(''), False)
-        imgLabel = gtk.Label('Downloads Path')
-        imgLabel.set_width_chars(13)
-        imgChooser = gtk.FileChooserButton('Downloads Path')
-        imgChooser.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
+        hbox = gtk.HBox()
+        hbox.set_spacing(15)
+        hbox.pack_start(gtk.Label(''), False)
+        hboxLabel = gtk.Label('Downloads Path')
+        hboxLabel.set_width_chars(13)
+        downloadChooser = gtk.FileChooserButton('Downloads Path')
+        downloadChooser.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
         
         saved_path = self.configuration['settings']['downloadPath']
         if saved_path:
-            imgChooser.connect('file-activated', self.file_selected, saved_path)
-            
-        imgChooser.emit('file-activated')
-        #imgChooser.connect('file-set', self.filechooser_changed, name)
-        img.pack_start(imgLabel, False)
-        img.pack_start(imgChooser)
-        img.pack_start(gtk.Label(''), False)
-        vbox.pack_start(img, False)
+            downloadChooser.connect('file-activated', self.file_selected, saved_path)
+            downloadChooser.emit('file-activated')
+        
+        downloadChooser.connect('selection-changed', self.filechooser_folder_changed, 'downloadPath')
+        hbox.pack_start(hboxLabel, False)
+        hbox.pack_start(downloadChooser)
+        hbox.pack_start(gtk.Label(''), False)
+        vbox.pack_start(hbox, False)
         
     def CreateLibsoupPathEntry(self, vbox, options):
         img = gtk.HBox()
@@ -201,9 +201,9 @@ class PreferencesWindow:
         saved_path = self.configuration['settings']['libsoupPath']
         if saved_path:
             imgChooser.connect('file-activated', self.file_selected, saved_path)
+            imgChooser.emit('file-activated')
             
-        imgChooser.emit('file-activated')
-        #imgChooser.connect('file-set', self.filechooser_changed, name)
+        imgChooser.connect('file-set', self.filechooser_changed, 'libsoupPath')
         img.pack_start(imgLabel, False)
         img.pack_start(imgChooser)
         img.pack_start(gtk.Label(''), False)
@@ -220,9 +220,8 @@ class PreferencesWindow:
         saved_path = self.configuration['settings']['libwebkitPath']
         if saved_path:
             imgChooser.connect('file-activated', self.file_selected, saved_path)
-        
-        imgChooser.emit('file-activated')
-        #imgChooser.connect('file-set', self.filechooser_changed, name)
+            imgChooser.emit('file-activated')
+        imgChooser.connect('file-set', self.filechooser_changed, 'libwebkitPath')
         img.pack_start(imgLabel, False)
         img.pack_start(imgChooser)
         img.pack_start(gtk.Label(''), False)
