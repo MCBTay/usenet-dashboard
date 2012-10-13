@@ -28,7 +28,10 @@ class SiteEntry:
         response = chooser.run()
         if response == gtk.RESPONSE_OK:
             self.update_button_thumbnail(button, chooser.get_filename())
-        chooser.destroy()    
+        self.img = chooser.get_filename() 
+        self.configuration['pages'][self.name][2] = self.img
+        chooser.destroy()   
+        
         
     # order is only passed for the name text entry as it is the key to our dictionary
     # name is passed in to know which record to update in the dictionary
@@ -49,11 +52,11 @@ class SiteEntry:
             # so far URL is the only other case, so i'm handling it specifically
             self.configuration['pages'][self.name][1] = newText
             
-    def combobox_changed(self, caller_widget, name = None):
+    def combobox_changed(self, caller_widget):
         # offset by one because get_active() returns the index of the active, not data
         newOrder = caller_widget.get_active() + 1 
-        if name:
-            self.configuration['pages'][name][0] = str(newOrder)
+        if self.name:
+            self.configuration['pages'][self.name][0] = str(newOrder)
         
     def filechooser_changed(self, caller_widget, name = None):
         newImg = caller_widget.get_filename()
@@ -69,7 +72,7 @@ class SiteEntry:
             if (self.configuration['pages'][nameText]):
                 del(self.configuration['pages'][nameText])
                 self.parent.RemoveEntry(nameText)
-        dialog.destroy()            
+        dialog.destroy()          
         
     def update_button_thumbnail(self, button, filename):
         image = gtk.Image()
@@ -147,7 +150,7 @@ class SiteEntry:
         cell = gtk.CellRendererText()
         orderDropdown.pack_start(cell, True)
         orderDropdown.add_attribute(cell, 'text', 0)
-        orderDropdown.connect('changed', self.combobox_changed, name)
+        orderDropdown.connect('changed', self.combobox_changed)
         
         if len(self.configuration['pages']) == 0:
             liststore.append([str(1)])
