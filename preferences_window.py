@@ -165,67 +165,33 @@ class PreferencesWindow:
         vbox = gtk.VBox()
         vbox.set_spacing(10)
         vbox.pack_start(gtk.Label(''), False)
-        self.CreateDownloadsPathEntry(vbox, options)
-        self.CreateLibsoupPathEntry(vbox, options)
-        self.CreateLibwebkitPathEntry(vbox, options)
+        
+        self.CreateGeneralOptionSelector(vbox, 'Downloads Path', 'downloadPath', True) 
+        self.CreateGeneralOptionSelector(vbox, 'libsoup Path', 'libsoupPath') 
         options.add(vbox)
         
-    def CreateDownloadsPathEntry(self, vbox, options):
+    def CreateGeneralOptionSelector(self, vbox, labelText, varName, folderSelect = False):
         hbox = gtk.HBox()
         hbox.set_spacing(15)
         hbox.pack_start(gtk.Label(''), False)
-        hboxLabel = gtk.Label('Downloads Path')
-        hboxLabel.set_width_chars(13)
-        downloadChooser = gtk.FileChooserButton('Downloads Path')
-        downloadChooser.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
+        label = gtk.Label(labelText)
+        label.set_width_chars(13)
+        chooser = gtk.FileChooserButton(labelText)
+        if folderSelect:
+            chooser.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
+            chooser.connect('selection-changed', self.filechooser_folder_changed, varName)
+        else:
+            chooser.connect('file-set', self.filechooser_changed, varName)
         
-        saved_path = self.configuration['settings']['downloadPath']
+        saved_path = self.configuration['settings'][varName]
         if saved_path:
-            downloadChooser.connect('file-activated', self.file_selected, saved_path)
-            downloadChooser.emit('file-activated')
-        
-        downloadChooser.connect('selection-changed', self.filechooser_folder_changed, 'downloadPath')
-        hbox.pack_start(hboxLabel, False)
-        hbox.pack_start(downloadChooser)
+            chooser.connect('file-activated', self.file_selected, saved_path)
+            chooser.emit('file-activated')
+             
+        hbox.pack_start(label, False)
+        hbox.pack_start(chooser)
         hbox.pack_start(gtk.Label(''), False)
         vbox.pack_start(hbox, False)
-        
-    def CreateLibsoupPathEntry(self, vbox, options):
-        img = gtk.HBox()
-        img.set_spacing(15)
-        img.pack_start(gtk.Label(''), False)
-        imgLabel = gtk.Label('libsoup Path')
-        imgLabel.set_width_chars(13)
-        imgChooser = gtk.FileChooserButton('libsoup Path')
-        
-        saved_path = self.configuration['settings']['libsoupPath']
-        if saved_path:
-            imgChooser.connect('file-activated', self.file_selected, saved_path)
-            imgChooser.emit('file-activated')
-            
-        imgChooser.connect('file-set', self.filechooser_changed, 'libsoupPath')
-        img.pack_start(imgLabel, False)
-        img.pack_start(imgChooser)
-        img.pack_start(gtk.Label(''), False)
-        vbox.pack_start(img, False)
-    
-    def CreateLibwebkitPathEntry(self, vbox, options):
-        img = gtk.HBox()
-        img.set_spacing(15)
-        img.pack_start(gtk.Label(''), False)
-        imgLabel = gtk.Label('libwebkit Path')
-        imgLabel.set_width_chars(13)
-        imgChooser = gtk.FileChooserButton('libwebkit Path')
-        
-        saved_path = self.configuration['settings']['libwebkitPath']
-        if saved_path:
-            imgChooser.connect('file-activated', self.file_selected, saved_path)
-            imgChooser.emit('file-activated')
-        imgChooser.connect('file-set', self.filechooser_changed, 'libwebkitPath')
-        img.pack_start(imgLabel, False)
-        img.pack_start(imgChooser)
-        img.pack_start(gtk.Label(''), False)
-        vbox.pack_start(img, False)
         
     def CreatePreferences(self):             
         notebook = gtk.Notebook()
