@@ -2,7 +2,7 @@
     <settings>
         <downloadPath>/path/to/download/folder/</downloadPath>
         <libsoupPath>/usr/lib/x86_64-linux-gnu/libsoup-2.4.so.1</libsoupPath>
-        <libwebkitPath>/usr/lib/libwebkitgtk-1.0.so.0</libwebkitPath>
+        <libwebkitPath>/usr/lib/x86_64-linux-gnu/libwebkitgtk-1.0.so.0</libwebkitPath>
     </settings>
     <pages>
       <page>
